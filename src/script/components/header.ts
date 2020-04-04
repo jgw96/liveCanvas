@@ -12,28 +12,15 @@ export class AppHeader extends LitElement {
         align-items: center;
         padding-left: 16px;
         padding-right: 16px;
-        background: var(--app-color-primary);
-        color: white;
-        height: 4em;
+        color: var(--app-color-primary);
+        height: 3.6em;
       }
 
       header h1 {
         margin-top: 0;
         margin-bottom: 0;
-        font-size: 24px;
-        font-weight: normal;
-      }
-
-      nav {
-        width: 7em;
-        display: flex;
-        justify-content: space-between;
-      }
-
-      nav a {
-        color: white;
         font-size: 18px;
-        font-weight: bold;
+        font-weight: normal;
       }
     `;
   }
@@ -45,12 +32,7 @@ export class AppHeader extends LitElement {
   render() {
     return html`
       <header>
-        <h1>PWA Starter</h1>
-
-        <nav>
-          <a href="./">Home</a>
-          <a href="./about">About</a>
-        </nav>
+        <h1>Live Canvas</h1>
       </header>
     `;
   }

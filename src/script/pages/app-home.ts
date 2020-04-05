@@ -32,6 +32,17 @@ export class AppHome extends LitElement {
         touch-action: none;
       }
 
+      pwa-install {
+        position: absolute;
+        top: 11px;
+        right: 8em;
+        z-index: 9999;
+      }
+
+      pwa-install::part(openButton) {
+        background: var(--app-color-primary);
+      }
+
       #newLive {
         position: fixed;
         bottom: 16px;
@@ -113,6 +124,10 @@ export class AppHome extends LitElement {
           border-radius: 22px;
           padding-left: 14px;
           padding-right: 14px;
+        }
+
+        pwa-install {
+          display: none;
         }
       }
 
@@ -362,8 +377,8 @@ export class AppHome extends LitElement {
 
       const contacts = await (navigator as any).contacts.select(props, opts);
 
-      this.gotContacts = true;
       this.contacts = contacts;
+      this.sendInvite();
     }
     else {
       await (navigator as any).share({
@@ -383,25 +398,16 @@ export class AppHome extends LitElement {
     var emailBody = '';
     (document as any).location = "mailto:" + email + "?subject=" + subject + "&body=" + emailBody;
 
-    this.gotContacts = false;
     this.contacts = [];
   }
 
   render() {
     return html`
       <div>
+        <pwa-install>Install Live Canvas</pwa-install>
+
         <canvas></canvas>
         <canvas id="secondCanvas"></canvas>
-
-        ${
-      this.gotContacts ? html`<div id="contactsAlert">
-            <div id="contactsBlock">
-              <h3>Invite Friends?</h3>
-
-              <button @click="${() => this.sendInvite()}">Email Invite</button>
-            </div>
-          </div>` : null
-      }
 
         <app-toolbar @mode-picked="${(e: CustomEvent) => this.handleMode(e.detail.mode)}" @color-picked="${(e: CustomEvent) => this.handleColor(e.detail.color)}"></app-toolbar>
       </div>

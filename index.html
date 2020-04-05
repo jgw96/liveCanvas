@@ -22,18 +22,15 @@
 
   <script type="module" src="build/script/pages/app-index.js"></script>
 
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"></script>
 </head>
 
 <body>
   <!-- Our app-index web component. This component is defined in src/pages/app-index.ts-->
   <app-index></app-index>
 
-  <script>
-    const socket = io("http://localhost:3000");
+  <script type="module" src="https://cdn.jsdelivr.net/npm/@pwabuilder/pwaauth/dist/pwa-auth.js" async defer></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js" async defer></script>
 
-    socket.emit('hello world');
-  </script>
 </body>
 
 </html>

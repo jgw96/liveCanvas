@@ -102,11 +102,14 @@ export class AppHome extends LitElement {
         font-weight: bold;
       }
 
+      #secondCanvas {
+        pointer-events: none;
+      }
+
       @media(max-width: 600px) {
         #newLive {
-          top: 10px;
-          right: 10px;
-          bottom: initial;
+          right: 6px;
+          bottom: 18px;
           border-radius: 22px;
           padding-left: 14px;
           padding-right: 14px;
@@ -139,6 +142,8 @@ export class AppHome extends LitElement {
 
       this.setupLiveEvents();
     }
+
+    window.addEventListener('resize', () => this.setupCanvas());
   }
 
   setupCanvas() {
@@ -166,7 +171,7 @@ export class AppHome extends LitElement {
   }
 
   socket_connect(room: any) {
-    return io('localhost:3000', {
+    return io('https://live-canvas-server.azurewebsites.net/', {
       query: 'r_var=' + room
     });
   }
@@ -175,6 +180,21 @@ export class AppHome extends LitElement {
     const module = await import('pointer-tracker');
 
     const canvas = (this.shadowRoot?.querySelector('canvas') as HTMLCanvasElement);
+
+    const cursorCanvas: HTMLCanvasElement | null | undefined = this.shadowRoot?.querySelector('#secondCanvas');
+    const cursorContext = cursorCanvas?.getContext("bitmaprenderer");
+
+    if (cursorCanvas) {
+      cursorCanvas.width = window.innerWidth;
+      cursorCanvas.height = window.innerHeight;
+    }
+
+    const offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);
+    const offscreenContext = offscreen.getContext('2d');
+
+    if (offscreenContext) {
+      offscreenContext.lineWidth = 4;
+    }
 
     let that = this;
 
@@ -186,8 +206,9 @@ export class AppHome extends LitElement {
       },
       end(pointer) {
         console.log(pointer);
+
       },
-      move(previousPointers, changedPointers, event) {
+      move(previousPointers, changedPointers, event: any) {
         console.log(event);
 
         if (that.mode === 'pen') {
@@ -221,6 +242,14 @@ export class AppHome extends LitElement {
               }
 
               that.ctx.stroke();
+
+              // cursor
+              offscreenContext?.beginPath();
+              offscreenContext?.arc(event.clientX, event.clientY, 10, 0, 2 * Math.PI);
+              offscreenContext?.stroke();
+
+              let bitmapOne = offscreen.transferToImageBitmap();
+              cursorContext?.transferFromImageBitmap(bitmapOne);
 
               if (that.socket) {
                 that.socket.emit('drawing', {
@@ -265,6 +294,9 @@ export class AppHome extends LitElement {
   }
 
   setupLiveEvents() {
+    const cursorCanvas: HTMLCanvasElement | null | undefined = this.shadowRoot?.querySelector('secondCanvas');
+    const cursorContext = cursorCanvas?.getContext("bitmaprenderer");
+
     this.socket.on('drawing', (data: any) => {
       console.log('data', data);
       console.log(this.ctx);
@@ -282,6 +314,22 @@ export class AppHome extends LitElement {
         else if (data.pointerType === 'mouse') {
           this.ctx.lineWidth = 4;
         }
+
+        const offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);
+        const offscreenContext = offscreen.getContext('2d');
+
+        offscreenContext?.beginPath();
+        offscreenContext?.arc(data.x0, data.y0, 50, 0, 2 * Math.PI)
+        offscreenContext?.stroke();
+
+        let bitmapOne = offscreen.transferToImageBitmap();
+        cursorContext?.transferFromImageBitmap(bitmapOne);
+
+        /* offscreenContext?.clearRect(0, 0, window.innerWidth, window.innerHeight);
+ 
+         let bitmapTwo = offscreen.transferToImageBitmap();
+         cursorContext?.transferFromImageBitmap(bitmapTwo);*/
+
 
         this.ctx.beginPath();
 
@@ -343,6 +391,7 @@ export class AppHome extends LitElement {
     return html`
       <div>
         <canvas></canvas>
+        <canvas id="secondCanvas"></canvas>
 
         ${
       this.gotContacts ? html`<div id="contactsAlert">

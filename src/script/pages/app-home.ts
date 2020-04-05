@@ -16,6 +16,7 @@ export class AppHome extends LitElement {
   @property() color: string = 'black';
   @property() mode: string = 'pen';
   @property({ type: Boolean }) gotContacts: boolean = false;
+  @property({ type: Boolean }) showToast: boolean = false;
 
   room: any = null;
   socket: any = null;
@@ -117,6 +118,32 @@ export class AppHome extends LitElement {
         pointer-events: none;
       }
 
+      #sessionToast {
+        z-index: 9999;
+        position: absolute;
+        bottom: 14px;
+        right: 14px;
+        background: var(--app-color-primary);
+        color: white;
+        padding: 12px;
+        border-radius: 6px;
+
+        animation-name: fadein;
+        animation-duration: 400ms;
+      }
+
+      #sessionToast button {
+        color: white;
+        border: solid 2px white;
+        background: none;
+        border-radius: 24px;
+        margin-left: 1em;
+        padding-left: 10px;
+        padding-right: 10px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+      }
+
       @media(max-width: 600px) {
         #newLive {
           right: 6px;
@@ -156,6 +183,12 @@ export class AppHome extends LitElement {
       this.socket = this.socket_connect(location.pathname);
 
       this.setupLiveEvents();
+
+      this.showToast = true;
+
+      setTimeout(() => {
+        this.showToast = false;
+      }, 5000);
     }
 
     window.addEventListener('resize', () => this.setupCanvas());
@@ -411,6 +444,14 @@ export class AppHome extends LitElement {
 
         <app-toolbar @mode-picked="${(e: CustomEvent) => this.handleMode(e.detail.mode)}" @color-picked="${(e: CustomEvent) => this.handleColor(e.detail.color)}"></app-toolbar>
       </div>
+
+      ${this.showToast ? html`
+        <div id="sessionToast">
+          You have started a new session
+
+          <button @click="${this.share}">Invite</button>
+        </div>
+      ` : null}
 
       ${location.pathname.length === 1 ? html`<button id="newLive" @click="${this.newLive}">New Session</button>` : html`<button id="shareRoom" @click="${this.share}">Invite</button>`}
     `;

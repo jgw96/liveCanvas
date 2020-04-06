@@ -35,7 +35,7 @@ export class AppHome extends LitElement {
 
       pwa-install {
         position: absolute;
-        top: 11px;
+        top: 14px;
         right: 8em;
         z-index: 9999;
       }
@@ -55,6 +55,15 @@ export class AppHome extends LitElement {
         border-radius: 2px;
         padding: 10px;
         font-size: 16px;
+
+        display: flex;
+        justify-content: center;
+        align-items: center;
+      }
+
+      #newLive img {
+        width: 18px;
+        margin-right: 8px;
       }
 
       #shareRoom {
@@ -156,6 +165,21 @@ export class AppHome extends LitElement {
         pwa-install {
           display: none;
         }
+
+        #newLive {
+          border-radius: 50%;
+          height: 48px;
+          width: 48px;
+          right: 16px;
+        }
+
+        #newLive span {
+          display: none;
+        }
+
+        #newLive img {
+          margin: 0;
+        }
       }
 
       @keyframes fadein {
@@ -191,7 +215,7 @@ export class AppHome extends LitElement {
       }, 5000);
     }
 
-    window.addEventListener('resize', () => this.setupCanvas());
+    window.addEventListener('resize', () => {this.setupCanvas(); this.setupEvents();});
   }
 
   setupCanvas() {
@@ -452,7 +476,7 @@ export class AppHome extends LitElement {
         </div>
       ` : null}
 
-      ${location.pathname.length === 1 ? html`<button id="newLive" @click="${this.newLive}">New Session</button>` : html`<button id="shareRoom" @click="${this.share}">Invite</button>`}
+      ${location.pathname.length === 1 ? html`<button id="newLive" @click="${this.newLive}"> <img src="/assets/add.svg"> <span>New Session</span></button>` : html`<button id="shareRoom" @click="${this.share}">Invite</button>`}
     `;
   }
 }

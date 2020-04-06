@@ -66,7 +66,7 @@ export class AppToolbar extends LitElement {
       }
 
       #innerBlock {
-        width: 14em;
+        width: 16em;
         display: flex;
         justify-content: space-between;
       }

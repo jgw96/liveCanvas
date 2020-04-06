@@ -27,7 +27,7 @@ export class AppHeader extends LitElement {
 
       pwa-auth {
         position: absolute;
-        top: 8px;
+        top: 10px;
         right: 16px;
         z-index: 9999;
       }

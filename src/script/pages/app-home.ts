@@ -373,11 +373,6 @@ export class AppHome extends LitElement {
         let bitmapOne = offscreen.transferToImageBitmap();
         cursorContext?.transferFromImageBitmap(bitmapOne);
 
-        /* offscreenContext?.clearRect(0, 0, window.innerWidth, window.innerHeight);
- 
-         let bitmapTwo = offscreen.transferToImageBitmap();
-         cursorContext?.transferFromImageBitmap(bitmapTwo);*/
-
 
         this.ctx.beginPath();
 
@@ -434,15 +429,19 @@ export class AppHome extends LitElement {
     this.contacts = [];
   }
 
+  handleClear() {
+    this.ctx?.clearRect(0, 0, window.innerWidth, window.innerHeight);
+  }
+
   render() {
     return html`
       <div>
         <pwa-install>Install Live Canvas</pwa-install>
 
-        <canvas></canvas>
+        <canvas id="firstCanvas"></canvas>
         <canvas id="secondCanvas"></canvas>
 
-        <app-toolbar @mode-picked="${(e: CustomEvent) => this.handleMode(e.detail.mode)}" @color-picked="${(e: CustomEvent) => this.handleColor(e.detail.color)}"></app-toolbar>
+        <app-toolbar @clear-picked="${() => this.handleClear()}" @mode-picked="${(e: CustomEvent) => this.handleMode(e.detail.mode)}" @color-picked="${(e: CustomEvent) => this.handleColor(e.detail.color)}"></app-toolbar>
       </div>
 
       ${this.showToast ? html`

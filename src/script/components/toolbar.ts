@@ -53,14 +53,14 @@ export class AppToolbar extends LitElement {
         background: black;
       }
 
-      #penButton, #eraserButton {
+      #penButton, #eraserButton, #clearButton {
         display: flex;
         align-items: center;
         justify-content: center;
         border: none;
       }
 
-      #penButton img, #eraserButton img {
+      #penButton img, #eraserButton img, #clearButton img {
         height: 18px;
         width: 18px;
       }
@@ -100,6 +100,15 @@ export class AppToolbar extends LitElement {
     this.activeMode = mode;
   }
 
+  clear() {
+    let event = new CustomEvent('clear-picked', {
+      detail: {
+        
+      }
+    });
+    this.dispatchEvent(event);
+  }
+
   render() {
     return html`
       <div id="innerBlock">
@@ -108,6 +117,8 @@ export class AppToolbar extends LitElement {
         <button id="yellowButton" @click="${() => this.pickColor('yellow')}"></button>
         <button id="greenButton" @click="${() => this.pickColor('green')}"></button>
         <button id="blackButton" @click="${() => this.pickColor('black')}"></button>
+
+        <button id="clearButton" @click="${() => this.clear()}"><img src="/assets/trash.svg"></button>
 
         ${this.activeMode === 'pen' ? html`<button id="eraserButton" @click="${() => this.penMode('erase')}"><img src="/assets/erase.svg"></button>` : html`<button id="penButton" @click="${() => this.penMode('pen')}"><img src="/assets/brush.svg"></button>`}
       </div>

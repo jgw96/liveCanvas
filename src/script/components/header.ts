@@ -16,6 +16,12 @@ export class AppHeader extends LitElement {
         padding-right: 16px;
         color: var(--app-color-primary);
         height: 3.6em;
+        background: white;
+
+        position: fixed;
+        left: 0;
+        right: 0;
+        z-index: 99999;
       }
 
       header h1 {
@@ -41,6 +47,14 @@ export class AppHeader extends LitElement {
         width: 6em;
         font-size: 16px;
         border-radius: 22px;
+      }
+
+      pwa-auth::part(googleButton) {
+        display: none;
+      }
+
+      pwa-auth::part(facebookButton) {
+        display: none;
       }
 
       #avatar {

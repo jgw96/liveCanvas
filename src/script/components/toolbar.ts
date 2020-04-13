@@ -5,6 +5,8 @@ import { LitElement, css, html, customElement, property } from 'lit-element';
 export class AppToolbar extends LitElement {
 
   @property({ type: String }) activeMode: string = 'pen';
+  @property({ type: Boolean }) showModeToast: boolean = false;
+  @property({ type: Boolean }) confirmDelete: boolean = false;
 
   static get styles() {
     return css`
@@ -70,6 +72,41 @@ export class AppToolbar extends LitElement {
         display: flex;
         justify-content: space-between;
       }
+
+      #modeToast {
+        position: fixed;
+        bottom: 14px;
+        right: 20%;
+        left: 20%;
+        background: var(--app-color-primary);
+        color: white;
+        padding: 12px;
+        border-radius: 6px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-weight: bold;
+        box-shadow: rgba(104, 107, 210, 0.38) 0px 0px 10px 4px;
+
+        animation-name: fadein;
+        animation-duration: 200ms;
+      }
+
+      @media(min-width: 800px) {
+        #modeToast {
+          right: 40%;
+          left: 40%;
+        }
+      }
+
+      @keyframes fadein {
+        from {
+          opacity: 0;
+        }
+        to {
+          opacity: 1;
+        }
+      }
     `;
   }
 
@@ -98,6 +135,13 @@ export class AppToolbar extends LitElement {
     this.dispatchEvent(event);
 
     this.activeMode = mode;
+
+    // show toast
+    this.showModeToast = true;
+
+    setTimeout(() => {
+      this.showModeToast = false;
+    }, 2000);
   }
 
   clear() {
@@ -119,6 +163,10 @@ export class AppToolbar extends LitElement {
         <button id="blackButton" @click="${() => this.pickColor('black')}"></button>
 
         <button id="clearButton" @click="${() => this.clear()}"><img src="/assets/trash.svg"></button>
+
+        ${this.showModeToast ? html`<div id="modeToast">${this.activeMode} mode</div>` : null}
+
+        ${this.confirmDelete ? html`` : null}
 
         ${this.activeMode === 'pen' ? html`<button id="eraserButton" @click="${() => this.penMode('erase')}"><img src="/assets/erase.svg"></button>` : html`<button id="penButton" @click="${() => this.penMode('pen')}"><img src="/assets/brush.svg"></button>`}
       </div>

@@ -74,9 +74,16 @@ export class AppHome extends LitElement {
         background: var(--app-color-secondary);
         color: white;
         border: none;
-        border-radius: 2px;
-        padding: 10px;
         font-size: 16px;
+
+        border-radius: 50%;
+        width: 56px;
+        height: 56px;
+      }
+
+      #shareRoom img {
+        width: 22px;
+        height: 22px;
       }
 
       #contactsAlert {
@@ -220,7 +227,9 @@ export class AppHome extends LitElement {
 
   setupCanvas() {
     const canvas = this.shadowRoot?.querySelector('canvas');
-    this.ctx = canvas?.getContext('2d');
+    this.ctx = canvas?.getContext('2d', {
+      desynchronized: true
+    });
 
     if (canvas) {
       canvas.height = window.innerHeight;
@@ -332,7 +341,8 @@ export class AppHome extends LitElement {
                   color: that.color,
                   pointerType: (event as PointerEvent).pointerType,
                   pressure: (event as PointerEvent).pressure,
-                  width: (event as PointerEvent).width
+                  width: (event as PointerEvent).width,
+                  globalCompositeOperation: 'source-over'
                 });
               }
             }
@@ -357,6 +367,20 @@ export class AppHome extends LitElement {
                 that.ctx.stroke();
               }
 
+              if (that.socket && previous) {
+                that.socket.emit('drawing', {
+                  x0: previous.clientX,
+                  y0: previous.clientY,
+                  x1: (event as PointerEvent).clientX,
+                  y1: (event as PointerEvent).clientY,
+                  color: that.color,
+                  pointerType: (event as PointerEvent).pointerType,
+                  pressure: (event as PointerEvent).pressure,
+                  width: (event as PointerEvent).width,
+                  globalCompositeOperation: 'destination-out'
+                });
+              }
+
             });
           }
         }
@@ -375,6 +399,8 @@ export class AppHome extends LitElement {
       if (this.ctx) {
         this.ctx.strokeStyle = data.color;
 
+        this.ctx.globalCompositeOperation = data.globalCompositeOperation;
+
         if (data.pointerType === 'pen') {
           let tweakedPressure = data.pressure * 6;
           this.ctx.lineWidth = data.width + tweakedPressure;
@@ -385,6 +411,10 @@ export class AppHome extends LitElement {
         }
         else if (data.pointerType === 'mouse') {
           this.ctx.lineWidth = 4;
+        }
+
+        if (data.globalCompositeOperation === 'destination-out') {
+          this.ctx.lineWidth = 18;
         }
 
         const offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);
@@ -476,7 +506,7 @@ export class AppHome extends LitElement {
         </div>
       ` : null}
 
-      ${location.pathname.length === 1 ? html`<button id="newLive" @click="${this.newLive}"> <img src="/assets/add.svg"> <span>New Session</span></button>` : html`<button id="shareRoom" @click="${this.share}">Invite</button>`}
+      ${location.pathname.length === 1 ? html`<button id="newLive" @click="${this.newLive}"> <img src="/assets/add.svg"> <span>New Session</span></button>` : html`<button id="shareRoom" @click="${this.share}"><img src="/assets/share.svg"></button>`}
     `;
   }
 }

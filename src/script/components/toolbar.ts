@@ -156,19 +156,19 @@ export class AppToolbar extends LitElement {
   render() {
     return html`
       <div id="innerBlock">
-        <button id="redButton" @click="${() => this.pickColor('red')}"></button>
-        <button id="blueButton" @click="${() => this.pickColor('blue')}"></button>
-        <button id="yellowButton" @click="${() => this.pickColor('yellow')}"></button>
-        <button id="greenButton" @click="${() => this.pickColor('green')}"></button>
-        <button id="blackButton" @click="${() => this.pickColor('black')}"></button>
+        <button id="redButton" aria-label="red color" @click="${() => this.pickColor('red')}"></button>
+        <button id="blueButton" aria-label="blue color" @click="${() => this.pickColor('blue')}"></button>
+        <button id="yellowButton" aria-label="yellow color" @click="${() => this.pickColor('yellow')}"></button>
+        <button id="greenButton" aria-label="green color" @click="${() => this.pickColor('green')}"></button>
+        <button id="blackButton" aria-label="black color" @click="${() => this.pickColor('black')}"></button>
 
-        <button id="clearButton" @click="${() => this.clear()}"><img src="/assets/trash.svg"></button>
+        <button id="clearButton" @click="${() => this.clear()}"><img src="/assets/trash.svg" alt="trash icon"></button>
 
         ${this.showModeToast ? html`<div id="modeToast">${this.activeMode} mode</div>` : null}
 
         ${this.confirmDelete ? html`` : null}
 
-        ${this.activeMode === 'pen' ? html`<button id="eraserButton" @click="${() => this.penMode('erase')}"><img src="/assets/erase.svg"></button>` : html`<button id="penButton" @click="${() => this.penMode('pen')}"><img src="/assets/brush.svg"></button>`}
+        ${this.activeMode === 'pen' ? html`<button id="eraserButton" @click="${() => this.penMode('erase')}"><img src="/assets/erase.svg" alt="erase icon"></button>` : html`<button id="penButton" @click="${() => this.penMode('pen')}"><img src="/assets/brush.svg" alt="brush icon"></button>`}
       </div>
     `;
   }

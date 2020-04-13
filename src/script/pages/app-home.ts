@@ -506,7 +506,7 @@ export class AppHome extends LitElement {
         </div>
       ` : null}
 
-      ${location.pathname.length === 1 ? html`<button id="newLive" @click="${this.newLive}"> <img src="/assets/add.svg"> <span>New Session</span></button>` : html`<button id="shareRoom" @click="${this.share}"><img src="/assets/share.svg"></button>`}
+      ${location.pathname.length === 1 ? html`<button id="newLive" @click="${this.newLive}"> <img src="/assets/add.svg" alt="add icon"> <span>New Session</span></button>` : html`<button id="shareRoom" @click="${this.share}"><img src="/assets/share.svg" alt="share icon"></button>`}
     `;
   }
 }

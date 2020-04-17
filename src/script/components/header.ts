@@ -1,5 +1,6 @@
 import { LitElement, css, html, customElement, property } from 'lit-element';
 
+import { set } from 'idb-keyval';
 
 @customElement('app-header')
 export class AppHeader extends LitElement {
@@ -33,7 +34,7 @@ export class AppHeader extends LitElement {
 
       pwa-auth {
         position: absolute;
-        top: 10px;
+        top: 14px;
         right: 16px;
         z-index: 9999;
       }
@@ -43,9 +44,12 @@ export class AppHeader extends LitElement {
         color: var(--app-color-primary);
         border: solid 2px var(--app-color-primary); 
         border-radius: 2px;
-        padding: 6px;
-        width: 6em;
-        font-size: 16px;
+        padding-top: 4px;
+        padding-bottom: 4px;
+        padding-left: 14px;
+        padding-right: 14px;
+        font-size: 14px;
+        font-weight: bold;
         border-radius: 22px;
       }
 
@@ -80,10 +84,12 @@ export class AppHeader extends LitElement {
 
   firstUpdated() {
     const pwaAuth = this.shadowRoot?.querySelector('pwa-auth');
-    pwaAuth?.addEventListener("signin-completed", (e: any) => {
+    pwaAuth?.addEventListener("signin-completed", async (e: any) => {
       console.log(e.detail)
       localStorage.setItem('user', JSON.stringify(e.detail));
       this.userData = e.detail;
+
+      await set('userData', this.userData);
     })
   }
 

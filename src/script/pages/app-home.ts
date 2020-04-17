@@ -6,6 +6,7 @@ import { randoRoom } from '../services/utils';
 import { Router } from '@vaadin/router';
 
 import '../components/toolbar';
+import { get } from 'idb-keyval';
 
 declare var io: any;
 
@@ -17,6 +18,7 @@ export class AppHome extends LitElement {
   @property() mode: string = 'pen';
   @property({ type: Boolean }) gotContacts: boolean = false;
   @property({ type: Boolean }) showToast: boolean = false;
+  @property({ type: Boolean }) endPrompt: boolean = false;
 
   room: any = null;
   socket: any = null;
@@ -37,7 +39,7 @@ export class AppHome extends LitElement {
         position: absolute;
         top: 14px;
         right: 8em;
-        z-index: 9999;
+        z-index: 99999;
       }
 
       pwa-install::part(openButton) {
@@ -61,9 +63,16 @@ export class AppHome extends LitElement {
         align-items: center;
       }
 
-      #newLive img {
+      #newLive img, #endButton img {
         width: 18px;
         margin-right: 8px;
+      }
+
+      #endButton img {
+        margin-right: 0;
+        height: 28px;
+        width: 28px;
+        margin-top: 4px;
       }
 
       #shareRoom {
@@ -77,8 +86,8 @@ export class AppHome extends LitElement {
         font-size: 16px;
 
         border-radius: 50%;
-        width: 56px;
-        height: 56px;
+        width: 48px;
+        height: 48px;
       }
 
       #shareRoom img {
@@ -160,6 +169,89 @@ export class AppHome extends LitElement {
         padding-bottom: 4px;
       }
 
+      #endButton {
+        position: fixed;
+        bottom: 16px;
+        right: 6em;
+        width: 48px;
+        height: 48px;
+        border-width: initial;
+        border-style: none;
+        border-color: initial;
+        border-image: initial;
+        border-radius: 50%;
+        background: #f84848;
+      }
+
+      #endPromptContainer {
+        z-index: 99999;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        background: #686bd296;
+        backdrop-filter: blur(10px);
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        padding-bottom: 8em;
+
+        animation-name: fadein;
+        animation-duration: 300ms;
+      }
+
+      #endPrompt {
+        background: white;
+        width: 20em;
+        height: 9em;
+        border-radius: 4px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-between;
+      }
+
+      #endPrompt h5 {
+        margin-left: 12px;
+        font-size: 18px;
+        margin-top: 14px;
+      }
+
+      #endPromptActions {
+        display: flex;
+        justify-content: flex-end;
+        padding: 16px;
+      }
+
+      #noButton {
+        color: red;
+        background: none;
+        border: none;
+        font-weight: bold;
+        width: 3em;
+        height: 2em;
+        font-size: 16px;
+
+        background: #d3d3d3bf;
+        border-radius: 18px;
+        width: 4em;
+        margin-right: 8px;
+      }
+
+      #endConfirm {
+        color: var(--app-color-primary);
+        background: none;
+        border: none;
+        font-weight: bold;
+        width: 3em;
+        height: 2em;
+        font-size: 16px;
+
+        background: #d3d3d3bf;
+        border-radius: 18px;
+        width: 4em;
+      }
+
       @media(max-width: 600px) {
         #newLive {
           right: 6px;
@@ -167,6 +259,11 @@ export class AppHome extends LitElement {
           border-radius: 22px;
           padding-left: 14px;
           padding-right: 14px;
+        }
+
+        #endButton {
+          bottom: 5.4em;
+          right: 16px;
         }
 
         pwa-install {
@@ -222,13 +319,13 @@ export class AppHome extends LitElement {
       }, 5000);
     }
 
-    window.addEventListener('resize', () => {this.setupCanvas(); this.setupEvents();});
+    window.addEventListener('resize', () => { this.setupCanvas(); this.setupEvents(); });
   }
 
   setupCanvas() {
     const canvas = this.shadowRoot?.querySelector('canvas');
     this.ctx = canvas?.getContext('2d', {
-      desynchronized: true
+      // desynchronized: true
     });
 
     if (canvas) {
@@ -278,6 +375,8 @@ export class AppHome extends LitElement {
     }
 
     let that = this;
+
+    const userData: any = await get('userData');
 
     new module.default(canvas, {
       start(pointer, event) {
@@ -342,7 +441,8 @@ export class AppHome extends LitElement {
                   pointerType: (event as PointerEvent).pointerType,
                   pressure: (event as PointerEvent).pressure,
                   width: (event as PointerEvent).width,
-                  globalCompositeOperation: 'source-over'
+                  globalCompositeOperation: 'source-over',
+                  user: userData.name
                 });
               }
             }
@@ -377,7 +477,8 @@ export class AppHome extends LitElement {
                   pointerType: (event as PointerEvent).pointerType,
                   pressure: (event as PointerEvent).pressure,
                   width: (event as PointerEvent).width,
-                  globalCompositeOperation: 'destination-out'
+                  globalCompositeOperation: 'destination-out',
+                  user: userData.name
                 });
               }
 
@@ -390,8 +491,15 @@ export class AppHome extends LitElement {
   }
 
   setupLiveEvents() {
-    const cursorCanvas: HTMLCanvasElement | null | undefined = this.shadowRoot?.querySelector('secondCanvas');
+    const cursorCanvas: HTMLCanvasElement | null | undefined = this.shadowRoot?.querySelector('#secondCanvas');
     const cursorContext = cursorCanvas?.getContext("bitmaprenderer");
+
+    const offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);
+    const offscreenContext = offscreen.getContext('2d');
+
+    if (offscreenContext) {
+      offscreenContext.font = '20px sans-serif';
+    }
 
     this.socket.on('drawing', (data: any) => {
       console.log('data', data);
@@ -417,12 +525,13 @@ export class AppHome extends LitElement {
           this.ctx.lineWidth = 18;
         }
 
-        const offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);
-        const offscreenContext = offscreen.getContext('2d');
-
         offscreenContext?.beginPath();
-        offscreenContext?.arc(data.x0, data.y0, 50, 0, 2 * Math.PI)
+        offscreenContext?.arc(data.x0, data.y0, 10, 0, 2 * Math.PI)
         offscreenContext?.stroke();
+
+        if (data.user) {
+          offscreenContext?.fillText(data.user, data.x0 + 14, data.y0)
+        }
 
         let bitmapOne = offscreen.transferToImageBitmap();
         cursorContext?.transferFromImageBitmap(bitmapOne);
@@ -487,6 +596,19 @@ export class AppHome extends LitElement {
     this.ctx?.clearRect(0, 0, window.innerWidth, window.innerHeight);
   }
 
+  endSession() {
+    // Router.go('/');
+    this.endPrompt = true;
+  }
+
+  end() {
+    Router.go('/');
+  }
+
+  no() {
+    this.endPrompt = false;
+  }
+
   render() {
     return html`
       <div>
@@ -506,6 +628,22 @@ export class AppHome extends LitElement {
         </div>
       ` : null}
 
+      ${
+      this.endPrompt ? html`
+          <div id="endPromptContainer">
+            <div id="endPrompt">
+              <h5>End Session?</h5>
+
+              <div id="endPromptActions">
+                <button id="noButton" @click="${this.no}">No</button>
+                <button id="endConfirm" @click="${this.end}">End</button>
+              </div>
+            </div>
+          </div>
+        ` : null
+      }
+
+      ${location.pathname.length > 1 ? html`<button id="endButton" @click="${this.endSession}"><img src="/assets/close.svg" alt="close session"></button>` : null}
       ${location.pathname.length === 1 ? html`<button id="newLive" @click="${this.newLive}"> <img src="/assets/add.svg" alt="add icon"> <span>New Session</span></button>` : html`<button id="shareRoom" @click="${this.share}"><img src="/assets/share.svg" alt="share icon"></button>`}
     `;
   }

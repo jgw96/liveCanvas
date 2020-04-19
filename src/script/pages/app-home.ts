@@ -46,6 +46,12 @@ export class AppHome extends LitElement {
         background: var(--app-color-primary);
       }
 
+      @media all and (display-mode: standalone) {
+        pwa-install {
+          display: none;
+        }
+      }
+
       #newLive {
         position: fixed;
         bottom: 16px;
@@ -139,7 +145,7 @@ export class AppHome extends LitElement {
         font-weight: bold;
       }
 
-      #secondCanvas {
+      #secondCanvas, #thirdCanvas {
         pointer-events: none;
       }
 
@@ -442,7 +448,7 @@ export class AppHome extends LitElement {
                   pressure: (event as PointerEvent).pressure,
                   width: (event as PointerEvent).width,
                   globalCompositeOperation: 'source-over',
-                  user: userData.name
+                  user: userData ? userData.name : null
                 });
               }
             }
@@ -478,7 +484,7 @@ export class AppHome extends LitElement {
                   pressure: (event as PointerEvent).pressure,
                   width: (event as PointerEvent).width,
                   globalCompositeOperation: 'destination-out',
-                  user: userData.name
+                  user: userData ? userData.name : null
                 });
               }
 
@@ -494,6 +500,16 @@ export class AppHome extends LitElement {
     const cursorCanvas: HTMLCanvasElement | null | undefined = this.shadowRoot?.querySelector('#secondCanvas');
     const cursorContext = cursorCanvas?.getContext("bitmaprenderer");
 
+    const thirdCanvas: HTMLCanvasElement | null | undefined = this.shadowRoot?.querySelector('#thirdCanvas');
+    const thirdContext = thirdCanvas?.getContext("2d");
+
+    if (thirdCanvas && thirdContext) {
+      thirdCanvas.width = window.innerWidth;
+      thirdCanvas.height = window.innerHeight;
+
+      thirdContext.lineCap = 'round';
+    }
+
     const offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);
     const offscreenContext = offscreen.getContext('2d');
 
@@ -502,27 +518,26 @@ export class AppHome extends LitElement {
     }
 
     this.socket.on('drawing', (data: any) => {
-      console.log('data', data);
-      console.log(this.ctx);
-      if (this.ctx) {
-        this.ctx.strokeStyle = data.color;
+      console.log(data);
+      if (thirdContext) {
+        thirdContext.strokeStyle = data.color;
 
-        this.ctx.globalCompositeOperation = data.globalCompositeOperation;
+        thirdContext.globalCompositeOperation = data.globalCompositeOperation;
 
         if (data.pointerType === 'pen') {
           let tweakedPressure = data.pressure * 6;
-          this.ctx.lineWidth = data.width + tweakedPressure;
+          thirdContext.lineWidth = data.width + tweakedPressure;
         }
 
         else if (data.pointerType === 'touch') {
-          this.ctx.lineWidth = data.width - 20;
+          thirdContext.lineWidth = data.width - 20;
         }
         else if (data.pointerType === 'mouse') {
-          this.ctx.lineWidth = 4;
+          thirdContext.lineWidth = 4;
         }
 
         if (data.globalCompositeOperation === 'destination-out') {
-          this.ctx.lineWidth = 18;
+          thirdContext.lineWidth = 18;
         }
 
         offscreenContext?.beginPath();
@@ -537,15 +552,15 @@ export class AppHome extends LitElement {
         cursorContext?.transferFromImageBitmap(bitmapOne);
 
 
-        this.ctx.beginPath();
+        thirdContext.beginPath();
 
-        this.ctx.moveTo(data.x0, data.y0);
-
-
-        this.ctx.lineTo(data.x1, data.y1);
+        thirdContext.moveTo(data.x0, data.y0);
 
 
-        this.ctx.stroke();
+        thirdContext.lineTo(data.x1, data.y1);
+
+
+        thirdContext.stroke();
       }
 
     });
@@ -616,6 +631,7 @@ export class AppHome extends LitElement {
 
         <canvas id="firstCanvas"></canvas>
         <canvas id="secondCanvas"></canvas>
+        <canvas id="thirdCanvas"></canvas>
 
         <app-toolbar @clear-picked="${() => this.handleClear()}" @mode-picked="${(e: CustomEvent) => this.handleMode(e.detail.mode)}" @color-picked="${(e: CustomEvent) => this.handleColor(e.detail.color)}"></app-toolbar>
       </div>

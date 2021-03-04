@@ -22,6 +22,8 @@
     "pointer-tracker": "^2.4.0"
   },
   "devDependencies": {
+    "@babel/compat-data": "^7.13.8",
+    "@babel/preset-env": "^7.13.9",
     "@rollup/plugin-strip": "^1.3.2",
     "concurrently": "^5.1.0",
     "es-dev-server": "^1.45.2",

@@ -11,7 +11,13 @@ import "../components/toolbar";
 import "../components/local-canvas";
 
 import { socket_connect } from "../services/handle-socket";
-import { changeColor, handleEvents, handleLiveEvents, setupCanvas } from "../services/handle-canvas";
+import {
+  changeColor,
+  handleEvents,
+  handleLiveEvents,
+  setupCanvas,
+} from "../services/handle-canvas";
+import { fileSave } from "browser-fs-access";
 
 declare var io: any;
 
@@ -30,7 +36,8 @@ export class AppHome extends LitElement {
 
   static get styles() {
     return css`
-      canvas, local-canvas {
+      canvas,
+      local-canvas {
         position: absolute;
         top: 0;
         left: 0;
@@ -42,7 +49,7 @@ export class AppHome extends LitElement {
       pwa-install {
         position: absolute;
         top: 14px;
-        right: 8em;
+        right: 7em;
         z-index: 99999;
       }
 
@@ -85,8 +92,6 @@ export class AppHome extends LitElement {
 
         animation-name: fadein;
         animation-duration: 200ms;
-
-
       }
 
       #endButton img {
@@ -226,6 +231,14 @@ export class AppHome extends LitElement {
         animation-duration: 300ms;
       }
 
+      @media(screen-spanning: single-fold-vertical) {
+        #endPromptContainer {
+          width: 50vw;
+          right: 0;
+          left: initial;
+        }
+      }
+
       #endPrompt {
         background: white;
         width: 20em;
@@ -338,7 +351,7 @@ export class AppHome extends LitElement {
   async firstUpdated() {
     this.setupCanvas();
 
-    if (location.pathname.length > 1) {
+    if (location.pathname.length > 1 || location.search === "?startLive") {
       // in room
 
       this.socket = socket_connect(location.pathname);
@@ -352,8 +365,7 @@ export class AppHome extends LitElement {
       setTimeout(() => {
         this.showToast = false;
       }, 5000);
-    }
-    else {
+    } else {
       await this.setupEvents();
     }
 
@@ -374,6 +386,8 @@ export class AppHome extends LitElement {
     const room = randoRoom();
     console.log(room);
 
+    (navigator as any).setAppBadge();
+
     if (room) {
       Router.go(`/${room}`);
     }
@@ -389,17 +403,30 @@ export class AppHome extends LitElement {
       | null
       | undefined = this.shadowRoot?.querySelector("#secondCanvas");
 
-    await handleEvents(canvas, cursorCanvas ? cursorCanvas : null, this.mode, this.color, this.ctx, this.socket);
+    await handleEvents(
+      canvas,
+      cursorCanvas ? cursorCanvas : null,
+      this.mode,
+      this.color,
+      this.ctx,
+      this.socket
+    );
   }
 
   async setupLiveEvents() {
+    const cursorCanvas:
+      | HTMLCanvasElement
+      | null
+      | undefined = this.shadowRoot?.querySelector("#secondCanvas");
+      
     const thirdCanvas:
       | HTMLCanvasElement
       | null
       | undefined = this.shadowRoot?.querySelector("#thirdCanvas");
+
     const thirdContext = thirdCanvas?.getContext("2d");
 
-    if (thirdCanvas && thirdContext) {
+    if (thirdCanvas && thirdContext && cursorCanvas) {
       await handleLiveEvents(thirdCanvas, thirdContext, this.socket);
     }
   }
@@ -448,7 +475,28 @@ export class AppHome extends LitElement {
   }
 
   handleClear() {
-    this.ctx?.clearRect(0, 0, window.innerWidth, window.innerHeight);
+    const canvas = this.shadowRoot?.querySelector("canvas");
+
+    if (this.ctx && canvas) {
+      this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
+      this.ctx.fillStyle = 'white';
+      this.ctx?.fillRect(0, 0, canvas.width, canvas.height);
+    }
+  }
+
+  async handleSave() {
+    const canvas = this.shadowRoot?.querySelector("canvas");
+
+    if (canvas) {
+      canvas.toBlob(async (blob) => {
+        if (blob) {
+          await fileSave(blob, {
+            fileName: "Untitled.png",
+            extensions: [".png"],
+          });
+        }
+      })
+    }
   }
 
   endSession() {
@@ -457,6 +505,8 @@ export class AppHome extends LitElement {
 
   end() {
     Router.go("/");
+
+    (navigator as any).clearAppBadge();
   }
 
   no() {
@@ -477,6 +527,7 @@ export class AppHome extends LitElement {
           @mode-picked="${(e: CustomEvent) => this.handleMode(e.detail.mode)}"
           @color-picked="${(e: CustomEvent) =>
             this.handleColor(e.detail.color)}"
+          @save-picked="${() => this.handleSave()}"
         ></app-toolbar>
       </div>
 

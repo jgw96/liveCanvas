@@ -1,6 +1,7 @@
 import { get } from "idb-keyval";
 
 let pickedColor: string | undefined;
+let cursorContext: ImageBitmapRenderingContext | null;
 
 export const setupCanvas = (canvas: HTMLCanvasElement) => {
   if (canvas) {
@@ -14,6 +15,9 @@ export const setupCanvas = (canvas: HTMLCanvasElement) => {
     if (ctx) {
       ctx.lineWidth = 5;
       ctx.lineCap = "round";
+
+      ctx.fillStyle = 'white';
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
     return ctx;
@@ -35,8 +39,6 @@ export const handleEvents = async (
   socket: any
 ) => {
   const module = await import("pointer-tracker");
-
-  let cursorContext: ImageBitmapRenderingContext | null;
 
   if (cursorCanvas) {
     cursorCanvas.width = window.innerWidth;
@@ -246,6 +248,9 @@ export const handleLiveEvents = (
       if (data.user) {
         offscreenContext?.fillText(data.user, data.x0 + 14, data.y0);
       }
+
+      let bitmapOne = offscreen.transferToImageBitmap();
+      cursorContext?.transferFromImageBitmap(bitmapOne);
 
       thirdContext.beginPath();
 

@@ -14,8 +14,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@pwabuilder/pwainstall": "^1.6.1",
+    "@pwabuilder/pwainstall": "^1.6.7",
     "@vaadin/router": "^1.7.1",
+    "browser-fs-access": "^0.14.0",
     "idb-keyval": "^3.2.0",
     "lit-element": "^2.3.0",
     "pointer-tracker": "^2.4.0"

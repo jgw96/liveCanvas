@@ -38,6 +38,15 @@
       "src": "assets/screenshots/screen.png"
     }
   ],
+  "shortcuts": [
+    {
+      "name": "Start Live Session",
+      "short_name": "Start Live",
+      "description": "Jump directly into starting a live session",
+      "url": "/?startLive",
+      "icons": [{ "src": "assets/icons/icon_128.png", "sizes": "128x128" }]
+    }
+  ],
   "features": [
     "Cross Platform",
     "fast",

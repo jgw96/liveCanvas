@@ -17,8 +17,6 @@ export class AppToolbar extends LitElement {
         background: white;
         padding: 8px;
         border-radius: 22px;
-        padding-left: 18px;
-        padding-right: 18px;
         box-shadow: 0 0 10px 4px #686bd261;
 
         animation-name: fadein;
@@ -58,14 +56,14 @@ export class AppToolbar extends LitElement {
         background: black;
       }
 
-      #penButton, #eraserButton, #clearButton {
+      #penButton, #eraserButton, #clearButton, #saveButton {
         display: flex;
         align-items: center;
         justify-content: center;
         border: none;
       }
 
-      #penButton img, #eraserButton img, #clearButton img {
+      #penButton img, #eraserButton img, #clearButton img, #saveButton img {
         height: 18px;
         width: 18px;
       }
@@ -99,6 +97,16 @@ export class AppToolbar extends LitElement {
         #modeToast {
           right: 40%;
           left: 40%;
+        }
+
+        #innerBlock {
+          flex-direction: column;
+          min-height: 17em;
+          width: 2em;
+          padding-top: 8px;
+          padding-bottom: 8px;
+          justify-content: space-between;
+          align-items: center;
         }
       }
 
@@ -156,6 +164,13 @@ export class AppToolbar extends LitElement {
     this.dispatchEvent(event);
   }
 
+  save() {
+    let event = new CustomEvent('save-picked', {
+      detail: {}
+    })
+    this.dispatchEvent(event);
+  }
+
   render() {
     return html`
       <div id="innerBlock">
@@ -166,6 +181,7 @@ export class AppToolbar extends LitElement {
         <button id="blackButton" aria-label="black color" @click="${() => this.pickColor('black')}"></button>
 
         <button id="clearButton" @click="${() => this.clear()}"><img src="/assets/trash.svg" alt="trash icon"></button>
+        <button id="saveButton" @click="${() => this.save()}"><img src="/assets/save-outline.svg" alt="save icon"></button>
 
         ${this.showModeToast ? html`<div id="modeToast">${this.activeMode} mode</div>` : null}
 

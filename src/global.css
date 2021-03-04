@@ -14,3 +14,9 @@ html, body {
   padding: 0;
   margin: 0;
 }
+
+fast-design-system-provider {
+  --accent-fill-rest: #686bd2;
+  --accent-fill-hover: #4a4d98;
+  --accent-fill-active: #686bd2;
+}

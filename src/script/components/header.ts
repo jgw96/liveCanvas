@@ -29,7 +29,7 @@ export class AppHeader extends LitElement {
         margin-top: 0;
         margin-bottom: 0;
         font-size: 18px;
-        font-weight: normal;
+        font-weight: bold;
       }
 
       pwa-auth {

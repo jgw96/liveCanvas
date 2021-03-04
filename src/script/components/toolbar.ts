@@ -20,6 +20,9 @@ export class AppToolbar extends LitElement {
         padding-left: 18px;
         padding-right: 18px;
         box-shadow: 0 0 10px 4px #686bd261;
+
+        animation-name: fadein;
+        animation-duration: 200ms;
       }
 
       button {

@@ -49,8 +49,10 @@ export class AppHome extends LitElement {
       pwa-install {
         position: absolute;
         top: 14px;
-        right: 7em;
+        right: 12em;
         z-index: 99999;
+
+        display: none;
       }
 
       pwa-install::part(openButton) {
@@ -71,8 +73,11 @@ export class AppHome extends LitElement {
         display: flex;
         align-items: center;
 
+        padding-left: 6px;
+        padding-right: 6px;
+
         animation-name: fadein;
-        animation-duration: 200ms;
+        animation-duration: 280ms;
       }
 
       #newLive::part(content) {
@@ -250,10 +255,15 @@ export class AppHome extends LitElement {
 
         padding: 8px;
         padding-top: 0px;
+
+        box-shadow: #00000024 0px 1px 8px 3px
       }
 
       #endPrompt h2 {
         color: black;
+        margin-top: 12px;
+        margin-left: 6px;
+        font-size: 22px;
       }
 
       #endPromptActions {

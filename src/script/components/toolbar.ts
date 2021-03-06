@@ -11,6 +11,7 @@ export class AppToolbar extends LitElement {
   static get styles() {
     return css`
       :host {
+        display: block;
         position: fixed;
         bottom: 16px;
         left: 16px;
@@ -20,7 +21,7 @@ export class AppToolbar extends LitElement {
         box-shadow: 0 0 10px 4px #686bd261;
 
         animation-name: fadein;
-        animation-duration: 200ms;
+        animation-duration: 280ms;
       }
 
       button {

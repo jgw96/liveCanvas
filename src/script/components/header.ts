@@ -1,10 +1,16 @@
-import { LitElement, css, html, customElement, property, internalProperty } from 'lit-element';
+import {
+  LitElement,
+  css,
+  html,
+  customElement,
+  property,
+  internalProperty,
+} from "lit-element";
 
-import { set } from 'idb-keyval';
+import { set } from "idb-keyval";
 
-@customElement('app-header')
+@customElement("app-header")
 export class AppHeader extends LitElement {
-
   @property({ type: Object }) userData: any = null;
 
   @internalProperty() openSettings: boolean = false;
@@ -39,7 +45,7 @@ export class AppHeader extends LitElement {
       pwa-auth::part(signInButton) {
         background: none;
         color: black;
-        border: solid 2px black; 
+        border: solid 2px black;
         border-radius: 2px;
         padding-top: 4px;
         padding-bottom: 4px;
@@ -71,11 +77,11 @@ export class AppHeader extends LitElement {
 
       #settings {
         position: fixed;
-        background: white;
-        box-shadow: #00000033 -2px 1px 14px 0px;
-        right: 0;
-        bottom: 0;
-        width: 15em;
+        background: #ffffff9e;
+        backdrop-filter: blur(10px);
+        box-shadow: rgb(0 0 0 / 20%) -2px 1px 14px 0px;
+        right: 0px;
+        bottom: 0px;
         height: 100%;
       }
 
@@ -97,8 +103,18 @@ export class AppHeader extends LitElement {
         padding: 8px;
       }
 
-      @media(max-width: 800px) {
+      .settings-item {
+        height: 15em;
+        padding-left: 10px;
+        padding-right: 10px;
+        margin: 10px;
+        width: 16em;
 
+        background: var(--app-color-primary);
+        color: white;
+      }
+
+      @media (max-width: 800px) {
       }
     `;
   }
@@ -108,53 +124,53 @@ export class AppHeader extends LitElement {
   }
 
   firstUpdated() {
-    const pwaAuth = this.shadowRoot?.querySelector('pwa-auth');
+    const pwaAuth = this.shadowRoot?.querySelector("pwa-auth");
     pwaAuth?.addEventListener("signin-completed", async (e: any) => {
-      console.log(e.detail)
-      localStorage.setItem('user', JSON.stringify(e.detail));
+      console.log(e.detail);
+      localStorage.setItem("user", JSON.stringify(e.detail));
       this.userData = e.detail;
 
-      await set('userData', this.userData);
-    })
+      await set("userData", this.userData);
+    });
   }
 
   async settings() {
     let initialSetting = this.openSettings;
 
     if (initialSetting === false) {
-      console.log('here');
+      console.log("here");
       this.openSettings = true;
 
       await this.updateComplete;
 
-      this.ani = this.shadowRoot?.querySelector("#settings")?.animate([
+      this.ani = this.shadowRoot?.querySelector("#settings")?.animate(
+        [
+          {
+            transform: "translateX(200px)",
+            opacity: 0,
+          },
+          {
+            transform: "translateX(0px)",
+            opacity: 1,
+          },
+        ],
         {
-          transform: "translateX(200px)",
-          opacity: 0
-        },
-        {
-          transform: "translateX(0px)",
-          opacity: 1,
+          duration: 280,
+          fill: "forwards",
         }
-      ], {
-        duration: 280,
-        fill: "forwards"
-      });
+      );
 
       console.log(this.ani);
-    }
-    else {
-      console.log('here reverse', this.ani);
+    } else {
+      console.log("here reverse", this.ani);
       this.ani?.reverse();
 
       if (this.ani) {
         this.ani.onfinish = () => {
           this.openSettings = false;
-        }
+        };
       }
-
     }
-
   }
 
   render() {
@@ -163,22 +179,51 @@ export class AppHeader extends LitElement {
         <h1>Live Canvas</h1>
 
         <div id="settingsBlock">
-        <fast-button @click="${() => this.settings()}" appearance="lightweight" id="settingsButton"><img src="/assets/settings-outline.svg" alt="settings icon"></fast-button>
+        <fast-button @click="${() =>
+          this.settings()}" appearance="lightweight" id="settingsButton"><img src="/assets/settings-outline.svg" alt="settings icon"></fast-button>
 
-        ${!this.userData ? html`<pwa-auth menuPlacement="end" appearance="button" microsoftkey="22410c67-5ee5-4a61-84a9-9a98af98d036"></pwa-auth>` :
-          html`
-            <div id="avatar">
-              <p>${this.userData.name}</p>
-            </div>
-          `
+        ${
+          !this.userData
+            ? html`<pwa-auth
+                menuPlacement="end"
+                appearance="button"
+                microsoftkey="22410c67-5ee5-4a61-84a9-9a98af98d036"
+              ></pwa-auth>`
+            : html`
+                <div id="avatar">
+                  <p>${this.userData.name}</p>
+                </div>
+              `
         }
         </div>
 
-        ${this.openSettings ? html`<div id="settings">
-          <div id="settingsHeader">
-            <fast-button @click="${() => this.settings()}">Close</fast-button>
-          </div>
-        </div>` : null}
+        ${
+          this.openSettings
+            ? html`<div id="settings">
+                <div id="settingsHeader">
+                  <fast-button @click="${() => this.settings()}"
+                    >Close</fast-button
+                  >
+                </div>
+
+                <fast-card class="settings-item">
+                  <h3>About</h3>
+                  <p>
+                    LiveCanvas is an open source collaborative drawing app
+                    offering a simple and fast user experience. LiveCanvas can
+                    be used with anyone, simply share a link and you are ready
+                    to go!
+                  </p>
+
+                  <fast-anchor
+                    href="https://github.com/jgw96/liveCanvas"
+                    apperance="button"
+                    >Github</fast-anchor
+                  >
+                </fast-card>
+              </div>`
+            : null
+        }
         </div>
       </header>
     `;

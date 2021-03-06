@@ -330,7 +330,7 @@ export class AppHome extends LitElement {
         #newLive {
           border-radius: 50%;
           height: 48px;
-          width: 48px;
+          width: 36px;
           right: 16px;
         }
 

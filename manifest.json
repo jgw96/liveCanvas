@@ -1,10 +1,10 @@
 {
-  "name": "Live Canvas",
+  "name": "LiveCanvas",
   "display": "standalone",
   "start_url": "/",
   "short_name": "LiveCanvas",
   "theme_color": "#686bd2",
-  "description": "This is a PWABuilder pwa-starter app",
+  "description": "LiveCanvas is an open source collaborative drawing app offering a simple and fast user experience. LiveCanvas can be used with anyone, simply share a link and you are ready to go!",
   "orientation": "any",
   "background_color": "#686bd2",
   "related_applications": [],
@@ -32,10 +32,10 @@
       "src": "assets/screenshots/screen.png"
     },
     {
-      "src": "assets/screenshots/screen.png"
+      "src": "assets/screenshots/mobile_1.png"
     },
     {
-      "src": "assets/screenshots/screen.png"
+      "src": "assets/screenshots/mobile_2.png"
     }
   ],
   "shortcuts": [

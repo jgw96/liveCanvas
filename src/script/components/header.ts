@@ -176,7 +176,7 @@ export class AppHeader extends LitElement {
   render() {
     return html`
       <header>
-        <h1>Live Canvas</h1>
+        <h1>LiveCanvas</h1>
 
         <div id="settingsBlock">
         <fast-button @click="${() =>

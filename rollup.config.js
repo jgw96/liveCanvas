@@ -35,11 +35,11 @@ export default {
       globPatterns: [
         '*.css',
         '**/*/*.svg',
+        "*.js",
         '*/**.js',
         '*.html',
-        'assets/**',
-        '*.json'
-      ]
+        'assets/**'
+      ],
     })
   ]
 };

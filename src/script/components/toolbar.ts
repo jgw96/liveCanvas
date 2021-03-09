@@ -57,20 +57,20 @@ export class AppToolbar extends LitElement {
         background: black;
       }
 
-      #penButton, #eraserButton, #clearButton, #saveButton {
+      #penButton, #eraserButton, #clearButton, #saveButton, #presentButton {
         display: flex;
         align-items: center;
         justify-content: center;
         border: none;
       }
 
-      #penButton img, #eraserButton img, #clearButton img, #saveButton img {
+      #penButton img, #eraserButton img, #clearButton img, #saveButton img, #presentButton img {
         height: 18px;
         width: 18px;
       }
 
       #innerBlock {
-        width: 16em;
+        width: 18em;
         display: flex;
         justify-content: space-between;
       }
@@ -102,7 +102,7 @@ export class AppToolbar extends LitElement {
 
         #innerBlock {
           flex-direction: column;
-          min-height: 17em;
+          min-height: 19em;
           width: 2em;
           padding-top: 8px;
           padding-bottom: 8px;
@@ -172,6 +172,13 @@ export class AppToolbar extends LitElement {
     this.dispatchEvent(event);
   }
 
+  present() {
+    let event = new CustomEvent('present-picked', {
+      detail:{}
+    });
+    this.dispatchEvent(event);
+  }
+
   render() {
     return html`
       <div id="innerBlock">
@@ -183,6 +190,7 @@ export class AppToolbar extends LitElement {
 
         <button id="clearButton" @click="${() => this.clear()}"><img src="/assets/trash.svg" alt="trash icon"></button>
         <button id="saveButton" @click="${() => this.save()}"><img src="/assets/save-outline.svg" alt="save icon"></button>
+        <!--<button id="presentButton" @click="${() => this.present()}"><img src="/assets/tv-outline.svg" alt="present icon"></button>-->
 
         ${this.showModeToast ? html`<div id="modeToast">${this.activeMode} mode</div>` : null}
 

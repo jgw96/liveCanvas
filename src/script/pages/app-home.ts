@@ -2,7 +2,7 @@ import { LitElement, css, html, customElement, property } from "lit-element";
 
 // For more info on the @pwabuilder/pwainstall component click here https://github.com/pwa-builder/pwa-install
 import "@pwabuilder/pwainstall";
-import { randoRoom } from "../services/utils";
+import { randoRoom, releaseWakeLock, requestWakeLock } from "../services/utils";
 import { Router } from "@vaadin/router";
 
 // import { get } from 'idb-keyval';
@@ -370,6 +370,12 @@ export class AppHome extends LitElement {
 
       this.setupLiveEvents();
 
+      if ('wakeLock' in navigator) {
+        // Screen Wake Lock API supported 🎉
+
+        await requestWakeLock();
+      }
+
       this.showToast = true;
 
       setTimeout(() => {
@@ -513,14 +519,23 @@ export class AppHome extends LitElement {
     this.endPrompt = true;
   }
 
-  end() {
+  async end() {
     Router.go("/");
 
     (navigator as any).clearAppBadge();
+
+    await releaseWakeLock();
   }
 
   no() {
     this.endPrompt = false;
+  }
+
+  async handlePresent() {
+    // @ts-ignore
+    const presentationRequest = new PresentationRequest([location.href]);
+    (navigator as any).presentation.defaultRequest = presentationRequest;
+    presentationRequest.start();
   }
 
   render() {
@@ -538,6 +553,7 @@ export class AppHome extends LitElement {
           @color-picked="${(e: CustomEvent) =>
             this.handleColor(e.detail.color)}"
           @save-picked="${() => this.handleSave()}"
+          @present-picked="${() => this.handlePresent()}"
         ></app-toolbar>
       </div>
 

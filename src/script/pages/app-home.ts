@@ -5,8 +5,6 @@ import "@pwabuilder/pwainstall";
 import { randoRoom, releaseWakeLock, requestWakeLock } from "../services/utils";
 import { Router } from "@vaadin/router";
 
-// import { get } from 'idb-keyval';
-
 import "../components/toolbar";
 
 import { socket_connect } from "../services/handle-socket";
@@ -16,7 +14,7 @@ import {
   handleLiveEvents,
   setupCanvas,
 } from "../services/handle-canvas";
-import { fileSave } from "browser-fs-access";
+import { fileSave, FileSystemHandle } from "browser-fs-access";
 
 declare var io: any;
 
@@ -32,6 +30,8 @@ export class AppHome extends LitElement {
   room: any = null;
   socket: any = null;
   contacts: any[] = [];
+
+  handle: FileSystemHandle | undefined;
 
   static get styles() {
     return css`
@@ -501,15 +501,28 @@ export class AppHome extends LitElement {
   async handleSave() {
     const canvas = this.shadowRoot?.querySelector("canvas");
 
+    const options = {
+      fileName: "Untitled.png",
+      extensions: [".png"],
+    };
+
     if (canvas) {
-      canvas.toBlob(async (blob) => {
-        if (blob) {
-          await fileSave(blob, {
-            fileName: "Untitled.png",
-            extensions: [".png"],
-          });
-        }
-      })
+      console.log('handle', this.handle);
+      if (this.handle) {
+        console.log('saving prev saved file');
+        canvas.toBlob(async (blob) => {
+          if (blob) {
+            this.handle = await fileSave(blob, options, this.handle);
+          }
+        })
+      }
+      else {
+        canvas.toBlob(async (blob) => {
+          if (blob) {
+            this.handle = await fileSave(blob, options);
+          }
+        })
+      }
     }
   }
 

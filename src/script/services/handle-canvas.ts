@@ -152,6 +152,8 @@ export const handleEvents = async (
                 user: userData ? userData.name : null,
               });
             }
+
+            
           }
         }
       } else if (mode === "erase") {

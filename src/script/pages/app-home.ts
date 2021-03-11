@@ -8,7 +8,6 @@ import { Router } from "@vaadin/router";
 // import { get } from 'idb-keyval';
 
 import "../components/toolbar";
-import "../components/local-canvas";
 
 import { socket_connect } from "../services/handle-socket";
 import {
@@ -36,8 +35,7 @@ export class AppHome extends LitElement {
 
   static get styles() {
     return css`
-      canvas,
-      local-canvas {
+      canvas {
         position: absolute;
         top: 0;
         left: 0;

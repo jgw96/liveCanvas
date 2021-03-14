@@ -1,4 +1,4 @@
-import { LitElement, css, html, customElement, property } from "lit-element";
+import { LitElement, css, html, customElement, property, internalProperty } from "lit-element";
 
 // For more info on the @pwabuilder/pwainstall component click here https://github.com/pwa-builder/pwa-install
 import "@pwabuilder/pwainstall";
@@ -6,15 +6,18 @@ import { randoRoom, releaseWakeLock, requestWakeLock } from "../services/utils";
 import { Router } from "@vaadin/router";
 
 import "../components/toolbar";
+import "../components/conn-manager";
 
 import { socket_connect } from "../services/handle-socket";
 import {
   changeColor,
   handleEvents,
   handleLiveEvents,
+  setHandle,
   setupCanvas,
 } from "../services/handle-canvas";
 import { fileSave, FileSystemHandle } from "browser-fs-access";
+import { get } from "idb-keyval";
 
 declare var io: any;
 
@@ -26,6 +29,8 @@ export class AppHome extends LitElement {
   @property({ type: Boolean }) gotContacts: boolean = false;
   @property({ type: Boolean }) showToast: boolean = false;
   @property({ type: Boolean }) endPrompt: boolean = false;
+
+  @internalProperty() handle: FileSystemHandle | undefined;
 
   room: any = null;
   socket: any = null;
@@ -234,7 +239,7 @@ export class AppHome extends LitElement {
         animation-duration: 300ms;
       }
 
-      @media(screen-spanning: single-fold-vertical) {
+      @media (screen-spanning: single-fold-vertical) {
         #endPromptContainer {
           width: 50vw;
           right: 0;
@@ -254,7 +259,7 @@ export class AppHome extends LitElement {
         padding: 8px;
         padding-top: 0px;
 
-        box-shadow: #00000024 0px 1px 8px 3px
+        box-shadow: #00000024 0px 1px 8px 3px;
       }
 
       #endPrompt h2 {
@@ -384,9 +389,64 @@ export class AppHome extends LitElement {
     }
 
     window.addEventListener("resize", () => {
-      this.setupCanvas();
-      this.setupEvents();
+      // this.setupCanvas();
+      this.handleResize();
+      // this.setupEvents();
     });
+  }
+
+  async handleResize() {
+    const canvas = this.shadowRoot?.querySelector(
+      "canvas"
+    ) as HTMLCanvasElement;
+
+    const cursorCanvas:
+      | HTMLCanvasElement
+      | null
+      | undefined = this.shadowRoot?.querySelector("#secondCanvas");
+
+    const thirdCanvas:
+      | HTMLCanvasElement
+      | null
+      | undefined = this.shadowRoot?.querySelector("#thirdCanvas");
+
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+
+    if (cursorCanvas) {
+      cursorCanvas.width = canvas.width;
+      cursorCanvas.height = canvas.height;
+    }
+
+    if (thirdCanvas) {
+      thirdCanvas.width = canvas.width;
+      thirdCanvas.height = canvas.height;
+    }
+
+    if (this.ctx) {
+      this.ctx.fillStyle = "white";
+      this.ctx.fillRect(
+        0,
+        0,
+        canvas.width,
+        canvas.height
+      );
+
+      this.ctx.lineCap = "round";
+      this.ctx.lineJoin = "round";
+      this.ctx.strokeStyle = this.color;
+      this.ctx.lineWidth = 5;
+    }
+
+    const canvasState = await (get("canvasState") as any);
+
+    if (canvasState) {
+      const tempImage = new Image();
+      tempImage.onload = () => {
+        this.ctx?.drawImage(tempImage, 0, 0);
+      };
+      tempImage.src = canvasState;
+    }
   }
 
   setupCanvas() {
@@ -432,7 +492,7 @@ export class AppHome extends LitElement {
       | HTMLCanvasElement
       | null
       | undefined = this.shadowRoot?.querySelector("#secondCanvas");
-      
+
     const thirdCanvas:
       | HTMLCanvasElement
       | null
@@ -493,7 +553,7 @@ export class AppHome extends LitElement {
 
     if (this.ctx && canvas) {
       this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-      this.ctx.fillStyle = 'white';
+      this.ctx.fillStyle = "white";
       this.ctx?.fillRect(0, 0, canvas.width, canvas.height);
     }
   }
@@ -578,6 +638,9 @@ export class AppHome extends LitElement {
               >
             </div>
           `
+        : null}
+      ${this.socket && this.socket !== null
+        ? html`<conn-manager .socket="${this.socket}"></conn-manager>`
         : null}
       ${this.endPrompt
         ? html`

@@ -1,7 +1,17 @@
-import { get } from "idb-keyval";
+import { fileSave, FileSystemHandle } from "browser-fs-access";
+import { get, set } from "idb-keyval";
 
 let pickedColor: string | undefined;
 let cursorContext: ImageBitmapRenderingContext | null;
+let handle: FileSystemHandle | undefined;
+
+export const setHandle = async (handle: FileSystemHandle) => {
+  if (handle) {
+    console.log('set handle', handle);
+    handle = handle;
+    await set('current_handle', handle);
+  }
+}
 
 export const setupCanvas = (canvas: HTMLCanvasElement) => {
   if (canvas) {
@@ -16,7 +26,7 @@ export const setupCanvas = (canvas: HTMLCanvasElement) => {
       ctx.lineWidth = 5;
       ctx.lineCap = "round";
 
-      ctx.fillStyle = 'white';
+      ctx.fillStyle = "white";
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
@@ -27,8 +37,8 @@ export const setupCanvas = (canvas: HTMLCanvasElement) => {
 };
 
 export const changeColor = (color: string) => {
-    pickedColor = color;
-}
+  pickedColor = color;
+};
 
 export const handleEvents = async (
   canvas: HTMLCanvasElement,
@@ -153,7 +163,14 @@ export const handleEvents = async (
               });
             }
 
-            
+            (window as any).requestIdleCallback(async () => {
+              if (canvas) {
+                let canvasState = canvas.toDataURL();
+                await set("canvasState", canvasState);
+              }
+            }, {
+              timeout: 200
+            });
           }
         }
       } else if (mode === "erase") {
@@ -190,6 +207,23 @@ export const handleEvents = async (
                 user: userData ? userData.name : null,
               });
             }
+
+            (window as any).requestIdleCallback(async () => {
+              if (canvas) {
+                let canvasState = canvas.toDataURL();
+                await set("canvasState", canvasState);
+
+                if (handle) {
+                  canvas.toBlob(async (blob) => {
+                    if (blob) {
+                      await fileSave(blob, {}, handle);
+                    }
+                  })
+                }
+              }
+            }, {
+              timeout: 200
+            });
           });
         }
       }

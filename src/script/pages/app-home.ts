@@ -484,7 +484,6 @@ export class AppHome extends LitElement {
 
   handleColor(color: string) {
     this.color = color;
-
     changeColor(this.color);
   }
 
@@ -545,9 +544,7 @@ export class AppHome extends LitElement {
     };
 
     if (canvas) {
-      console.log('handle', this.handle);
       if (this.handle) {
-        console.log('saving prev saved file');
         canvas.toBlob(async (blob) => {
           if (blob) {
             this.handle = await fileSave(blob, options, this.handle);

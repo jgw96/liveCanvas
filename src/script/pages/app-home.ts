@@ -13,7 +13,6 @@ import {
   changeColor,
   handleEvents,
   handleLiveEvents,
-  setHandle,
   setupCanvas,
 } from "../services/handle-canvas";
 import { fileSave, FileSystemHandle } from "browser-fs-access";
@@ -35,8 +34,6 @@ export class AppHome extends LitElement {
   room: any = null;
   socket: any = null;
   contacts: any[] = [];
-
-  handle: FileSystemHandle | undefined;
 
   static get styles() {
     return css`

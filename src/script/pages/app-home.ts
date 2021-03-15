@@ -7,6 +7,7 @@ import { Router } from "@vaadin/router";
 
 import "../components/toolbar";
 import "../components/conn-manager";
+import "../components/app-contacts";
 
 import { socket_connect } from "../services/handle-socket";
 import {
@@ -18,6 +19,7 @@ import {
 } from "../services/handle-canvas";
 import { fileSave, FileSystemHandle } from "browser-fs-access";
 import { get } from "idb-keyval";
+import { getContacts } from "../services/graph-api";
 
 declare var io: any;
 
@@ -518,6 +520,9 @@ export class AppHome extends LitElement {
   async share() {
     const supported = "contacts" in navigator && "ContactsManager" in window;
 
+    const graphContacts = await getContacts();
+    console.log('graphContacts', graphContacts);
+
     if (supported) {
       const props = ["name", "email"];
       const opts = { multiple: true };
@@ -526,7 +531,13 @@ export class AppHome extends LitElement {
 
       this.contacts = contacts;
       this.sendInvite();
-    } else {
+    }
+    else if (graphContacts) {
+      this.contacts = graphContacts;
+      
+
+    }
+     else {
       await (navigator as any).share({
         url: location.href,
         text: "Join me on my board",
@@ -535,10 +546,19 @@ export class AppHome extends LitElement {
     }
   }
 
+  handleContacts(contacts: any) {
+    console.log(contacts);
+  }
+
   sendInvite() {
     let email = "";
     this.contacts.forEach((contact) => {
-      email = email + "," + contact.email[0];
+      if (contact.email) {
+        email = email + "," + contact.email[0];
+      }
+      else {
+        email = email + "," + contact.emailAddresses[0].address;
+      }
     });
     var subject = "Join me on my board";
     var emailBody = "";
@@ -675,9 +695,9 @@ export class AppHome extends LitElement {
             <img src="/assets/add.svg" alt="add icon" />
             <span>New Session</span></fast-button
           >`
-        : html`<button id="shareRoom" @click="${this.share}">
-            <img src="/assets/share.svg" alt="share icon" />
-          </button>`}
+        : html`<app-contacts id="shareRoom"
+        @got-contacts="${(ev: CustomEvent) => this.handleContacts(ev)}"
+      ></app-contacts>`}
     `;
   }
 }

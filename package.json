@@ -14,6 +14,7 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
+    "@azure/msal-browser": "^2.12.0",
     "@pwabuilder/pwainstall": "^1.6.7",
     "@vaadin/router": "^1.7.1",
     "browser-fs-access": "^0.14.0",

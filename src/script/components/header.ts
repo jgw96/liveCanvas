@@ -8,6 +8,7 @@ import {
 } from "lit-element";
 
 import { set } from "idb-keyval";
+import { getAccount, login } from "../services/auth";
 
 @customElement("app-header")
 export class AppHeader extends LitElement {
@@ -124,14 +125,13 @@ export class AppHeader extends LitElement {
   }
 
   firstUpdated() {
-    const pwaAuth = this.shadowRoot?.querySelector("pwa-auth");
-    pwaAuth?.addEventListener("signin-completed", async (e: any) => {
-      console.log(e.detail);
-      localStorage.setItem("user", JSON.stringify(e.detail));
-      this.userData = e.detail;
 
-      await set("userData", this.userData);
-    });
+  }
+
+  async login() {
+    await login();
+    const account = await getAccount();
+    console.log(account);
   }
 
   async settings() {
@@ -184,14 +184,10 @@ export class AppHeader extends LitElement {
 
         ${
           !this.userData
-            ? html`<pwa-auth
-                menuPlacement="end"
-                appearance="button"
-                microsoftkey="22410c67-5ee5-4a61-84a9-9a98af98d036"
-              ></pwa-auth>`
+            ? html`<fast-button @click="${() => this.login()}">Login</fast-button>`
             : html`
                 <div id="avatar">
-                  <p>${this.userData.name}</p>
+                  <p>logged in</p>
                 </div>
               `
         }

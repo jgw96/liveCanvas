@@ -11,6 +11,7 @@ import "../components/conn-manager";
 import { socket_connect } from "../services/handle-socket";
 import {
   changeColor,
+  changeMode,
   handleEvents,
   handleLiveEvents,
   resetCursorCanvas,
@@ -479,7 +480,6 @@ export class AppHome extends LitElement {
     await handleEvents(
       canvas,
       cursorCanvas ? cursorCanvas : null,
-      this.mode,
       this.color,
       this.ctx,
       this.socket
@@ -510,8 +510,9 @@ export class AppHome extends LitElement {
     changeColor(this.color);
   }
 
-  handleMode(mode: string) {
+  handleMode(mode: "pen" | "erase") {
     this.mode = mode;
+    changeMode(mode);
   }
 
   async share() {

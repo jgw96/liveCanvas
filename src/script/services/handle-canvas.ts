@@ -2,6 +2,7 @@ import { fileSave, FileSystemHandle } from "browser-fs-access";
 import { get, set } from "idb-keyval";
 
 let pickedColor: string | undefined;
+let pickedMode: 'pen' | 'erase' = "pen";
 let cursorContext: ImageBitmapRenderingContext | null;
 let handle: FileSystemHandle | undefined;
 let offscreen: OffscreenCanvas | undefined;
@@ -43,10 +44,13 @@ export const changeColor = (color: string) => {
   pickedColor = color;
 };
 
+export const changeMode = (mode: "pen" | "erase") => {
+  pickedMode = mode;
+}
+
 export const handleEvents = async (
   canvas: HTMLCanvasElement,
   cursorCanvas: HTMLCanvasElement | null,
-  mode: string,
   color: string,
   ctx: CanvasRenderingContext2D | null | undefined,
   socket: any
@@ -81,7 +85,7 @@ export const handleEvents = async (
     move(previousPointers, changedPointers, event: any) {
       console.log(event);
 
-      if (mode === "pen") {
+      if (pickedMode === "pen") {
         if (ctx) {
           ctx.globalCompositeOperation = "source-over";
         }
@@ -178,7 +182,8 @@ export const handleEvents = async (
             });
           }
         }
-      } else if (mode === "erase") {
+      } else if (pickedMode === "erase") {
+        console.log('erasing');
         if (ctx) {
           ctx.globalCompositeOperation = "destination-out";
 

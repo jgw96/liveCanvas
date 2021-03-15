@@ -1,3 +1,4 @@
+import { set } from "idb-keyval";
 import {
   LitElement,
   css,
@@ -6,8 +7,6 @@ import {
   property,
   internalProperty,
 } from "lit-element";
-
-import { set } from "idb-keyval";
 
 @customElement("app-header")
 export class AppHeader extends LitElement {

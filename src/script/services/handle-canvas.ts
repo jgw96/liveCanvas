@@ -6,6 +6,7 @@ let cursorContext: ImageBitmapRenderingContext | null;
 let handle: FileSystemHandle | undefined;
 let offscreen: OffscreenCanvas | undefined;
 let offscreenContext: OffscreenCanvasRenderingContext2D | null;
+let thirdContext: CanvasRenderingContext2D | null;
 
 export const setHandle = async (handle: FileSystemHandle) => {
   if (handle) {
@@ -240,6 +241,10 @@ export const resetCursorCanvas = (width: number, height: number) => {
     offscreen.width = width;
     offscreen.height = height;
   }
+
+  if (thirdContext) {
+    thirdContext.lineCap = "round";
+  }
 }
 
 export const handleLiveEvents = (
@@ -252,6 +257,8 @@ export const handleLiveEvents = (
     thirdCanvas.height = window.innerHeight;
 
     thirdContext.lineCap = "round";
+
+    thirdContext = thirdContext;
   }
 
   const offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);

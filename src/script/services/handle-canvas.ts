@@ -4,6 +4,9 @@ import { get, set } from "idb-keyval";
 let pickedColor: string | undefined;
 let cursorContext: ImageBitmapRenderingContext | null;
 let handle: FileSystemHandle | undefined;
+let offscreen: OffscreenCanvas | undefined;
+let offscreenContext: OffscreenCanvasRenderingContext2D | null;
+let thirdContext: CanvasRenderingContext2D | null;
 
 export const setHandle = async (handle: FileSystemHandle) => {
   if (handle) {
@@ -57,8 +60,8 @@ export const handleEvents = async (
     cursorContext = cursorCanvas.getContext("bitmaprenderer");
   }
 
-  const offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);
-  const offscreenContext = offscreen.getContext("2d");
+  offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);
+  offscreenContext = offscreen.getContext("2d");
 
   if (offscreenContext) {
     offscreenContext.lineWidth = 4;
@@ -142,8 +145,10 @@ export const handleEvents = async (
             );
             offscreenContext?.stroke();
 
-            let bitmapOne = offscreen.transferToImageBitmap();
-            cursorContext?.transferFromImageBitmap(bitmapOne);
+            let bitmapOne = offscreen?.transferToImageBitmap();
+            if (bitmapOne) {
+              cursorContext?.transferFromImageBitmap(bitmapOne);
+            }
 
             if (socket) {
               console.log("pointer event", event);
@@ -231,6 +236,17 @@ export const handleEvents = async (
   });
 };
 
+export const resetCursorCanvas = (width: number, height: number) => {
+  if (offscreen) {
+    offscreen.width = width;
+    offscreen.height = height;
+  }
+
+  if (thirdContext) {
+    thirdContext.lineCap = "round";
+  }
+}
+
 export const handleLiveEvents = (
   thirdCanvas: HTMLCanvasElement,
   thirdContext: CanvasRenderingContext2D,
@@ -241,6 +257,8 @@ export const handleLiveEvents = (
     thirdCanvas.height = window.innerHeight;
 
     thirdContext.lineCap = "round";
+
+    thirdContext = thirdContext;
   }
 
   const offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);

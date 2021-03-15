@@ -14,7 +14,7 @@ import {
   changeColor,
   handleEvents,
   handleLiveEvents,
-  setHandle,
+  resetCursorCanvas,
   setupCanvas,
 } from "../services/handle-canvas";
 import { fileSave, FileSystemHandle } from "browser-fs-access";
@@ -37,8 +37,6 @@ export class AppHome extends LitElement {
   room: any = null;
   socket: any = null;
   contacts: any[] = [];
-
-  handle: FileSystemHandle | undefined;
 
   static get styles() {
     return css`
@@ -393,6 +391,7 @@ export class AppHome extends LitElement {
     window.addEventListener("resize", () => {
       // this.setupCanvas();
       this.handleResize();
+      resetCursorCanvas(window.innerWidth, window.innerHeight);
       // this.setupEvents();
     });
   }

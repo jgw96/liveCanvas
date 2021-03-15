@@ -38,7 +38,8 @@ export default {
         "*.js",
         '*/**.js',
         '*.html',
-        'assets/**'
+        'assets/**',
+        'manifest.json'
       ],
     })
   ]

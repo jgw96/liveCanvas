@@ -65,11 +65,13 @@ export const handleEvents = async (
     cursorContext = cursorCanvas.getContext("bitmaprenderer");
   }
 
-  offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);
-  offscreenContext = offscreen.getContext("2d");
+  if (window.OffscreenCanvas) {
+    offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);
+    offscreenContext = offscreen.getContext("2d");
 
-  if (offscreenContext) {
-    offscreenContext.lineWidth = 4;
+    if (offscreenContext) {
+      offscreenContext.lineWidth = 4;
+    }
   }
 
   const userData: any = await get("userData");
@@ -274,11 +276,13 @@ export const handleLiveEvents = (
     thirdContext = thirdContext;
   }
 
-  const offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);
-  const offscreenContext = offscreen.getContext("2d");
+  if (window.OffscreenCanvas) {
+    const offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);
+    const offscreenContext = offscreen.getContext("2d");
 
-  if (offscreenContext) {
-    offscreenContext.font = "20px sans-serif";
+    if (offscreenContext) {
+      offscreenContext.font = "20px sans-serif";
+    }
   }
 
   socket.on("drawing", (data: any) => {
@@ -316,8 +320,11 @@ export const handleLiveEvents = (
         offscreenContext?.fillText(data.user, data.x0 + 14, data.y0);
       }
 
-      let bitmapOne = offscreen.transferToImageBitmap();
-      cursorContext?.transferFromImageBitmap(bitmapOne);
+      let bitmapOne = offscreen?.transferToImageBitmap();
+
+      if (bitmapOne) {
+        cursorContext?.transferFromImageBitmap(bitmapOne);
+      }
 
       thirdContext.beginPath();
 

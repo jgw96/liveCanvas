@@ -439,7 +439,9 @@ export class AppHome extends LitElement {
     const room = randoRoom();
     console.log(room);
 
-    (navigator as any).setAppBadge();
+    if ((navigator as any).setAppBadge) {
+      (navigator as any).setAppBadge();
+    }
 
     if (room) {
       Router.go(`/${room}`);
@@ -582,8 +584,10 @@ export class AppHome extends LitElement {
 
   async end() {
     Router.go("/");
-
-    (navigator as any).clearAppBadge();
+    
+    if ((navigator as any).clearAppBadge) {
+      (navigator as any).clearAppBadge();
+    }
 
     await releaseWakeLock();
   }

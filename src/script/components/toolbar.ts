@@ -197,7 +197,7 @@ export class AppToolbar extends LitElement {
         <button id="clearButton" @click="${() => this.clear()}"><img src="/assets/trash.svg" alt="trash icon"></button>
         <button id="saveButton" @click="${() => this.save()}"><img src="/assets/save-outline.svg" alt="save icon"></button>
         <!--<button id="presentButton" @click="${() => this.present()}"><img src="/assets/tv-outline.svg" alt="present icon"></button>-->
-        <button id="devicesButton" @click="${() => this.shareToDevice()}">Device</button>
+        <!--<button id="devicesButton" @click="${() => this.shareToDevice()}">Device</button>-->
 
         ${this.showModeToast ? html`<div id="modeToast">${this.activeMode} mode</div>` : null}
 

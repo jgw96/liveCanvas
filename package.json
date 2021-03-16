@@ -8,8 +8,8 @@
     "build": "rimraf dist/ && tsc && rollup -c",
     "build:watch": "tsc --watch",
     "build:prod": "rimraf dist/ && tsc && rollup -c",
-    "start": "es-dev-server --app-index index.html --node-resolve --watch --open",
-    "dev": "concurrently \"tsc --watch\" \"es-dev-server --app-index index.html --compatibility none --node-resolve --watch --open\""
+    "start": "es-dev-server --port 8001 --app-index index.html --node-resolve --watch --open",
+    "dev": "concurrently \"tsc --watch\" \"es-dev-server --port 8001 --app-index index.html --compatibility none --node-resolve --watch --open\""
   },
   "author": "",
   "license": "ISC",

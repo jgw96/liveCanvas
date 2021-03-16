@@ -64,6 +64,7 @@ export async function login() {
       await msalInstance.loginRedirect({
         scopes
       });
+      
     }
   } catch (err) {
     // handle error

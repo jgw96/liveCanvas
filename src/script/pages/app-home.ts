@@ -19,7 +19,6 @@ import {
 } from "../services/handle-canvas";
 import { fileSave, FileSystemHandle } from "browser-fs-access";
 import { get } from "idb-keyval";
-import { getContacts } from "../services/graph-api";
 
 declare var io: any;
 
@@ -519,9 +518,6 @@ export class AppHome extends LitElement {
   async share() {
     const supported = "contacts" in navigator && "ContactsManager" in window;
 
-    const graphContacts = await getContacts();
-    console.log('graphContacts', graphContacts);
-
     if (supported) {
       const props = ["name", "email"];
       const opts = { multiple: true };
@@ -530,11 +526,6 @@ export class AppHome extends LitElement {
 
       this.contacts = contacts;
       this.sendInvite();
-    }
-    else if (graphContacts) {
-      this.contacts = graphContacts;
-      
-
     }
      else {
       await (navigator as any).share({
@@ -547,20 +538,24 @@ export class AppHome extends LitElement {
 
   handleContacts(contacts: any) {
     console.log(contacts);
+
+    this.contacts = contacts.detail.data;
+    this.sendInvite();
   }
 
   sendInvite() {
     let email = "";
     this.contacts.forEach((contact) => {
-      if (contact.email) {
-        email = email + "," + contact.email[0];
+      console.log('contact', contact);
+      if (email.length > 0) {
+        email = email + "," + contact;
       }
       else {
-        email = email + "," + contact.emailAddresses[0].address;
+        email = contact;
       }
     });
-    var subject = "Join me on my board";
-    var emailBody = "";
+    let subject = "Join me on my board";
+    let emailBody = `Join me on this whiteboard: ${location.href}`;
     (document as any).location =
       "mailto:" + email + "?subject=" + subject + "&body=" + emailBody;
 

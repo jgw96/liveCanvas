@@ -1,50 +1,76 @@
 {
-  "name": "LiveCanvas",
-  "display": "standalone",
-  "start_url": "/",
-  "short_name": "LiveCanvas",
-  "theme_color": "#686bd2",
-  "description": "LiveCanvas is an open source collaborative drawing app offering a simple and fast user experience. LiveCanvas can be used with anyone, simply share a link and you are ready to go!",
-  "orientation": "any",
   "background_color": "#686bd2",
-  "related_applications": [],
+  "description": "LiveCanvas is an open source collaborative drawing app offering a simple and fast user experience. LiveCanvas can be used with anyone, simply share a link and you are ready to go!",
+  "display": "standalone",
+  "lang": "EN-US",
+  "name": "LiveCanvas",
+  "orientation": "any",
   "prefer_related_applications": false,
-  "icons": [
-    {
-      "src": "assets/icons/icon_512.png",
-      "sizes": "512x512"
-    },
-    {
-      "src": "assets/icons/icon_256.png",
-      "sizes": "256x256"
-    },
-    {
-      "src": "assets/icons/icon_128.png",
-      "sizes": "128x128"
-    },
-    {
-      "src": "assets/icons/icon_64.png",
-      "sizes": "64x64"
-    }
+  "related_applications": [],
+  "short_name": "LiveCanvas",
+  "start_url": "/",
+  "theme_color": "#686bd2",
+  "categories": [
+    "utility",
+    "tools"
   ],
   "screenshots": [
     {
-      "src": "assets/screenshots/screen.png"
+      "src": "/assets/screenshots/screen.png",
+      "type": "image/png",
+      "sizes": "1711x1264",
+      "purpose": "any",
+      "platform": "windows"
     },
     {
-      "src": "assets/screenshots/mobile_1.png"
+      "src": "/assets/screenshots/screen_2.png",
+      "type": "image/png",
+      "sizes": "1711x1261",
+      "purpose": "any",
+      "platform": "webapp"
+    }
+  ],
+  "iarc_rating_id": null,
+  "icons": [
+    {
+      "src": "/assets/icons/maskable_icon.png",
+      "type": "image/png",
+      "sizes": "512x512",
+      "purpose": "maskable"
     },
     {
-      "src": "assets/screenshots/mobile_2.png"
+      "src": "/assets/icons/icon_256.png",
+      "type": "image/png",
+      "sizes": "256x256",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icons/icon_128.png",
+      "type": "image/png",
+      "sizes": "128x128",
+      "purpose": "any"
+    },
+    {
+      "src": "/assets/icons/icon_64.png",
+      "type": "image/png",
+      "sizes": "64x64",
+      "purpose": "any"
     }
   ],
   "shortcuts": [
     {
       "name": "Start Live Session",
-      "short_name": "Start Live",
-      "description": "Jump directly into starting a live session",
       "url": "/?startLive",
-      "icons": [{ "src": "assets/icons/icon_128.png", "sizes": "128x128" }]
+      "description": "Jump directly into starting a live session",
+      "short_name": "Start Live",
+      "icons": [
+        {
+          "src": "/assets/icons/icon_128.png",
+          "type": "image/png",
+          "sizes": "128x128",
+          "purpose": "any"
+        }
+      ]
     }
   ],
   "features": [

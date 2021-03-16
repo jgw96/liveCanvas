@@ -2,10 +2,12 @@ import { fileSave, FileSystemHandle } from "browser-fs-access";
 import { get, set } from "idb-keyval";
 
 let pickedColor: string | undefined;
+let pickedMode: 'pen' | 'erase' = "pen";
 let cursorContext: ImageBitmapRenderingContext | null;
 let handle: FileSystemHandle | undefined;
 let offscreen: OffscreenCanvas | undefined;
 let offscreenContext: OffscreenCanvasRenderingContext2D | null;
+let thirdCanvas: HTMLCanvasElement | undefined;
 let thirdContext: CanvasRenderingContext2D | null;
 
 export const setHandle = async (handle: FileSystemHandle) => {
@@ -43,10 +45,13 @@ export const changeColor = (color: string) => {
   pickedColor = color;
 };
 
+export const changeMode = (mode: "pen" | "erase") => {
+  pickedMode = mode;
+}
+
 export const handleEvents = async (
   canvas: HTMLCanvasElement,
   cursorCanvas: HTMLCanvasElement | null,
-  mode: string,
   color: string,
   ctx: CanvasRenderingContext2D | null | undefined,
   socket: any
@@ -81,7 +86,7 @@ export const handleEvents = async (
     move(previousPointers, changedPointers, event: any) {
       console.log(event);
 
-      if (mode === "pen") {
+      if (pickedMode === "pen") {
         if (ctx) {
           ctx.globalCompositeOperation = "source-over";
         }
@@ -178,7 +183,8 @@ export const handleEvents = async (
             });
           }
         }
-      } else if (mode === "erase") {
+      } else if (pickedMode === "erase") {
+        console.log('erasing');
         if (ctx) {
           ctx.globalCompositeOperation = "destination-out";
 
@@ -242,6 +248,11 @@ export const resetCursorCanvas = (width: number, height: number) => {
     offscreen.height = height;
   }
 
+  if (thirdCanvas) {
+    thirdCanvas.width = width;
+    thirdCanvas.height = height;
+  }
+
   if (thirdContext) {
     thirdContext.lineCap = "round";
   }
@@ -255,6 +266,8 @@ export const handleLiveEvents = (
   if (thirdCanvas && thirdContext) {
     thirdCanvas.width = window.innerWidth;
     thirdCanvas.height = window.innerHeight;
+
+    thirdCanvas = thirdCanvas;
 
     thirdContext.lineCap = "round";
 

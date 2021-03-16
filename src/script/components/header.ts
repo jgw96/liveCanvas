@@ -1,4 +1,5 @@
 import { clear, set } from "idb-keyval";
+
 import {
   LitElement,
   css,
@@ -7,6 +8,7 @@ import {
   property,
   internalProperty,
 } from "lit-element";
+
 
 import { getAccount, login, logout } from "../services/auth";
 

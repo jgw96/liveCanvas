@@ -12,6 +12,7 @@ import "../components/app-contacts";
 import { socket_connect } from "../services/handle-socket";
 import {
   changeColor,
+  changeMode,
   handleEvents,
   handleLiveEvents,
   resetCursorCanvas,
@@ -388,10 +389,8 @@ export class AppHome extends LitElement {
     }
 
     window.addEventListener("resize", () => {
-      // this.setupCanvas();
       this.handleResize();
       resetCursorCanvas(window.innerWidth, window.innerHeight);
-      // this.setupEvents();
     });
   }
 
@@ -400,28 +399,8 @@ export class AppHome extends LitElement {
       "canvas"
     ) as HTMLCanvasElement;
 
-    const cursorCanvas:
-      | HTMLCanvasElement
-      | null
-      | undefined = this.shadowRoot?.querySelector("#secondCanvas");
-
-    const thirdCanvas:
-      | HTMLCanvasElement
-      | null
-      | undefined = this.shadowRoot?.querySelector("#thirdCanvas");
-
     canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
-
-    if (cursorCanvas) {
-      cursorCanvas.width = canvas.width;
-      cursorCanvas.height = canvas.height;
-    }
-
-    if (thirdCanvas) {
-      thirdCanvas.width = canvas.width;
-      thirdCanvas.height = canvas.height;
-    }
 
     if (this.ctx) {
       this.ctx.fillStyle = "white";
@@ -480,7 +459,6 @@ export class AppHome extends LitElement {
     await handleEvents(
       canvas,
       cursorCanvas ? cursorCanvas : null,
-      this.mode,
       this.color,
       this.ctx,
       this.socket
@@ -507,12 +485,12 @@ export class AppHome extends LitElement {
 
   handleColor(color: string) {
     this.color = color;
-
     changeColor(this.color);
   }
 
-  handleMode(mode: string) {
+  handleMode(mode: "pen" | "erase") {
     this.mode = mode;
+    changeMode(mode);
   }
 
   async share() {
@@ -581,9 +559,7 @@ export class AppHome extends LitElement {
     };
 
     if (canvas) {
-      console.log('handle', this.handle);
       if (this.handle) {
-        console.log('saving prev saved file');
         canvas.toBlob(async (blob) => {
           if (blob) {
             this.handle = await fileSave(blob, options, this.handle);

@@ -7,6 +7,7 @@ import { Router } from "@vaadin/router";
 
 import "../components/toolbar";
 import "../components/conn-manager";
+import "../components/app-contacts";
 
 import { socket_connect } from "../services/handle-socket";
 import {
@@ -503,7 +504,8 @@ export class AppHome extends LitElement {
 
       this.contacts = contacts;
       this.sendInvite();
-    } else {
+    }
+     else {
       await (navigator as any).share({
         url: location.href,
         text: "Join me on my board",
@@ -512,13 +514,26 @@ export class AppHome extends LitElement {
     }
   }
 
+  handleContacts(contacts: any) {
+    console.log(contacts);
+
+    this.contacts = contacts.detail.data;
+    this.sendInvite();
+  }
+
   sendInvite() {
     let email = "";
     this.contacts.forEach((contact) => {
-      email = email + "," + contact.email[0];
+      console.log('contact', contact);
+      if (email.length > 0) {
+        email = email + "," + contact;
+      }
+      else {
+        email = contact;
+      }
     });
-    var subject = "Join me on my board";
-    var emailBody = "";
+    let subject = "Join me on my board";
+    let emailBody = `Join me on this whiteboard: ${location.href}`;
     (document as any).location =
       "mailto:" + email + "?subject=" + subject + "&body=" + emailBody;
 
@@ -650,9 +665,9 @@ export class AppHome extends LitElement {
             <img src="/assets/add.svg" alt="add icon" />
             <span>New Session</span></fast-button
           >`
-        : html`<button id="shareRoom" @click="${this.share}">
-            <img src="/assets/share.svg" alt="share icon" />
-          </button>`}
+        : html`<app-contacts id="shareRoom"
+        @got-contacts="${(ev: CustomEvent) => this.handleContacts(ev)}"
+      ></app-contacts>`}
     `;
   }
 }

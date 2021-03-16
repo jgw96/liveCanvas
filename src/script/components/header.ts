@@ -1,4 +1,5 @@
-import { set } from "idb-keyval";
+import { clear, set } from "idb-keyval";
+
 import {
   LitElement,
   css,
@@ -7,6 +8,9 @@ import {
   property,
   internalProperty,
 } from "lit-element";
+
+
+import { getAccount, login, logout } from "../services/auth";
 
 @customElement("app-header")
 export class AppHeader extends LitElement {
@@ -113,6 +117,15 @@ export class AppHeader extends LitElement {
         color: white;
       }
 
+      #loginButton, #logoutButton {
+        display: flex;
+        align-items: center;
+        padding-left: 6px;
+        padding-right: 6px;
+        border-radius: 22px;
+        width: 5em;
+      }
+
       @media (max-width: 800px) {
       }
     `;
@@ -122,15 +135,36 @@ export class AppHeader extends LitElement {
     super();
   }
 
-  firstUpdated() {
-    const pwaAuth = this.shadowRoot?.querySelector("pwa-auth");
-    pwaAuth?.addEventListener("signin-completed", async (e: any) => {
-      console.log(e.detail);
-      localStorage.setItem("user", JSON.stringify(e.detail));
-      this.userData = e.detail;
+  async firstUpdated() {
+    const account = await getAccount();
+    console.log(account);
+    if (account) {
+      this.userData = account;
 
-      await set("userData", this.userData);
-    });
+      await set('userData', account);
+    }
+    else {
+      // delay and try again
+      setTimeout(async () => {
+        const account = await getAccount();
+        console.log(account);
+        if (account) {
+          this.userData = account;
+
+          await set('userData', account);
+        }
+      }, 2000);
+    }
+  }
+
+  async login() {
+    await login();
+    const account = await getAccount();
+    console.log(account);
+
+    this.userData = account;
+
+    await set('userData', account);
   }
 
   async settings() {
@@ -172,6 +206,18 @@ export class AppHeader extends LitElement {
     }
   }
 
+  async handleLogout() {
+    try {
+      await logout();
+      await clear();
+
+      this.userData = null;
+    }
+    catch (err) {
+      console.error(err);
+    }
+  }
+
   render() {
     return html`
       <header>
@@ -183,15 +229,11 @@ export class AppHeader extends LitElement {
 
         ${
           !this.userData
-            ? html`<pwa-auth
-                menuPlacement="end"
-                appearance="button"
-                microsoftkey="22410c67-5ee5-4a61-84a9-9a98af98d036"
-              ></pwa-auth>`
+            ? html`<fast-button id="loginButton" appearance="accent" @click="${() => this.login()}">Login</fast-button>`
             : html`
-                <div id="avatar">
-                  <p>${this.userData.name}</p>
-                </div>
+                <fast-button id="logoutButton" @click="${() => this.handleLogout()}" id="avatar">
+                  <p>Logout</p>
+                </fast-button>
               `
         }
         </div>

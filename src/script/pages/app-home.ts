@@ -34,6 +34,8 @@ export class AppHome extends LitElement {
 
   @internalProperty() handle: FileSystemHandle | undefined;
 
+  @internalProperty() showCopyToast: boolean = false;
+
   room: any = null;
   socket: any = null;
   contacts: any[] = [];
@@ -66,6 +68,26 @@ export class AppHome extends LitElement {
         pwa-install {
           display: none;
         }
+      }
+
+      #copyToast {
+        z-index: 9999;
+        position: absolute;
+        bottom: 14px;
+        right: 14px;
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+        background: var(--app-color-primary);
+        color: white;
+        font-weight: bold;
+        padding: 20px;
+
+        box-shadow: rgb(104 107 210 / 38%) 0px 0px 10px 4px;
+        border-radius: 6px;
+
+        animation-name: fadein;
+        animation-duration: 400ms;
       }
 
       #newLive {
@@ -507,12 +529,24 @@ export class AppHome extends LitElement {
       this.contacts = contacts;
       this.sendInvite();
     }
-     else {
+    else if ((navigator as any).share) {
       await (navigator as any).share({
         url: location.href,
         text: "Join me on my board",
         title: "Live Canvas",
       });
+    }
+    else if(navigator.clipboard) {
+      await navigator.clipboard.writeText(`${location.href}`);
+      
+      // hide invite toast if still up
+      this.showToast = false;
+
+      this.showCopyToast = true;
+
+      setTimeout(() => {
+        this.showCopyToast = false
+      }, 3000);
     }
   }
 
@@ -621,6 +655,11 @@ export class AppHome extends LitElement {
           @present-picked="${() => this.handlePresent()}"
         ></app-toolbar>
       </div>
+
+      ${
+        this.showCopyToast ? html`<div id="copyToast">URL copied to clipboard for sharing</div>` : null
+      }
+      
 
       ${this.showToast
         ? html`

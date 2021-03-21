@@ -20,6 +20,7 @@ import {
 } from "../services/handle-canvas";
 import { fileSave, FileSystemHandle } from "browser-fs-access";
 import { get } from "idb-keyval";
+import { saveSession } from "../services/sessions";
 
 declare var io: any;
 
@@ -457,7 +458,7 @@ export class AppHome extends LitElement {
     }
   }
 
-  newLive() {
+  async newLive() {
     const room = randoRoom();
     console.log(room);
 
@@ -466,6 +467,7 @@ export class AppHome extends LitElement {
     }
 
     if (room) {
+      console.log('room', room);
       Router.go(`/${room}`);
     }
   }

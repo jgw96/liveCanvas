@@ -1,6 +1,7 @@
 import { LitElement, css, html, customElement } from 'lit-element';
 
 import './app-home';
+import './app-intro';
 
 import { Router } from '@vaadin/router';
 
@@ -26,9 +27,10 @@ export class AppIndex extends LitElement {
     // For more info on using the @vaadin/router check here https://vaadin.com/router
     const router = new Router(this.shadowRoot?.querySelector('#routerOutlet'));
     router.setRoutes([
-      { path: '/', component: 'app-home' },
+      { path: '/', component: 'app-intro' },
       {
-        path: '/:room', component: 'app-home'
+        path: '/:room', 
+        component: 'app-home'
       },
       {
         path: "/about",

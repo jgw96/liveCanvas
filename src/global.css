@@ -7,6 +7,8 @@
   --app-color-primary: #686bd2;
   --app-color-secondary: #68d268;
   --font-family: sans-serif;
+
+  --background-color: white;
 }
 
 html, body {
@@ -19,4 +21,5 @@ fast-design-system-provider {
   --accent-fill-rest: #686bd2;
   --accent-fill-hover: #4a4d98;
   --accent-fill-active: #686bd2;
+  --background-color: var(--background-color);
 }

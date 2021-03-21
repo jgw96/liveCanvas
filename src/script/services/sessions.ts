@@ -1,6 +1,6 @@
 import { get, set } from "idb-keyval";
 
-export async function getSavedSessions(): Promise<string[] | null> {
+export async function getSavedSessions(): Promise<any[] | null> {
   const sessions: Array<string> | null = await get("savedSessions");
 
   if (sessions) {
@@ -15,11 +15,16 @@ export async function saveSession(session: string) {
     const sessions: Array<string> | null = await get("savedSessions");
     console.log("sessions", sessions);
 
+    const newSession = {
+      session,
+      date: new Date(Date.now()).toLocaleDateString(),
+    }
+
     if (sessions) {
-        const newSessions = [...sessions, session];
+        const newSessions = [...sessions, newSession];
         await set("savedSessions", newSessions);
     }
     else {
-        await set("savedSessions", [session]);
+        await set("savedSessions", [newSession]);
     }
 }

@@ -117,6 +117,12 @@ export class AppHeader extends LitElement {
         color: white;
       }
 
+      .settings-item fast-anchor {
+        border-radius: 22px;
+        padding-left: 6px;
+        padding-right: 6px;
+      }
+
       #loginButton, #logoutButton {
         display: flex;
         align-items: center;

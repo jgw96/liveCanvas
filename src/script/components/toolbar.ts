@@ -71,9 +71,9 @@ export class AppToolbar extends LitElement {
       }
 
       #innerBlock {
-        width: 18em;
         display: flex;
         justify-content: space-between;
+        width: 18em;
       }
 
       #modeToast {
@@ -109,6 +109,19 @@ export class AppToolbar extends LitElement {
           padding-bottom: 8px;
           justify-content: space-between;
           align-items: center;
+        }
+      }
+
+      @media(max-width: 420px) {
+        :host {
+          right: 16px;
+
+          padding-left: 16px;
+          padding-right: 16px;
+        }
+
+        #innerBlock {
+          width: 100%;
         }
       }
 

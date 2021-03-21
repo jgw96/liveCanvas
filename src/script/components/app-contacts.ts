@@ -141,6 +141,12 @@ export class AppContacts extends LitElement {
           opacity: 1;
         }
       }
+
+      @media(max-width: 420px) {
+        #contactsButton {
+          bottom: 4.4em;
+        }
+      }
     `;
   }
 

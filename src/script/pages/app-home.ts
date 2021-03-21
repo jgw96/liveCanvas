@@ -20,7 +20,6 @@ import {
 } from "../services/handle-canvas";
 import { fileSave, FileSystemHandle } from "browser-fs-access";
 import { get } from "idb-keyval";
-import { saveSession } from "../services/sessions";
 
 declare var io: any;
 
@@ -270,6 +269,15 @@ export class AppHome extends LitElement {
         }
       }
 
+      @media(screen-spanning: single-fold-horizontal) {
+        #endPromptContainer {
+          height: 50vh;
+          right: 0;
+          left: 0;
+          padding-bottom: 0;
+        }
+      }
+
       #endPrompt {
         background: white;
         width: 20em;
@@ -337,15 +345,19 @@ export class AppHome extends LitElement {
         width: 4em;
       }
 
-      @media (max-width: 600px) {
+      @media (max-width: 420px) {
         #newLive {
           right: 6px;
           bottom: 15px;
           border-radius: 22px;
         }
 
+        #shareRoom {
+          bottom: 4.4em;
+        }
+
         #endButton {
-          bottom: 5.4em;
+          bottom: 9.4em;
           right: 16px;
         }
 

@@ -1,0 +1,60 @@
+<!DOCTYPE html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>LiveCanvas</title>
+
+    <meta
+      name="viewport"
+      content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
+    />
+    <meta name="description" content="LiveCanvas is an open source collaborative drawing app offering a simple and fast user experience. LiveCanvas can be used with anyone, simply share a link and you are ready to go!" />
+    <meta name="theme-color" content="#686bd2" />
+
+    <meta name="apple-mobile-web-app-capable" content="yes" />
+    <meta name="apple-mobile-web-app-title" content="LiveCanvas" />
+    <meta name="apple-mobile-web-app-status-bar-style" content="black" />
+
+    <link rel="preload" href="global.css" as="style" />
+
+    <link rel="icon" href="asset/icons/icon_24.png" type="image/x-icon" />
+
+    <link rel="manifest" href="manifest.json" />
+
+    <link href="global.css" rel="stylesheet" />
+
+    <link rel="prefetch" as="script" href="fast-components.js">
+    <link rel="prefetch" as="script" href="script/app-index.js">
+
+    <script type="module" src="script/app-index.js"></script>
+  </head>
+
+  <body>
+    <!-- Our app-index web component. This component is defined in src/pages/app-index.ts-->
+    <fast-design-system-provider use-defaults>
+      <app-index></app-index>
+    </fast-design-system-provider>
+
+    <!-- For more info on the pwa-update component click here https://github.com/pwa-builder/pwa-update -->
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@pwabuilder/pwaupdate"
+    ></script>
+    <pwa-update swpath="/pwabuilder-sw.js"></pwa-update>
+
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@pwabuilder/pwaauth/dist/pwa-auth.js"
+      async
+      defer
+    ></script>
+    <script
+      src="https://cdnjs.cloudflare.com/ajax/libs/socket.io/2.2.0/socket.io.js"
+      async
+      defer
+    ></script>
+
+    <!-- Microsoft Fast Components https://www.fast.design/docs/components/getting-started-->
+    <script type="module" src="fast-components.js"></script>
+  </body>
+</html>

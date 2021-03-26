@@ -58,6 +58,18 @@ export class AppIntro extends LitElement {
         }
       }
 
+      @media (min-width: 1028px) {
+        #saved-list {
+          max-width: 80vw;
+        }
+      }
+
+      @media (max-width: 800px) and (orientation: portrait) {
+        #saved-list {
+          grid-template-columns: 50% 48%;
+        }
+      }
+
       @media(screen-spanning: single-fold-vertical) {
         #saved-list {
           display: grid;

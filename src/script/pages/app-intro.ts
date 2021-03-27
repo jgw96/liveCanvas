@@ -35,13 +35,14 @@ export class AppIntro extends LitElement {
       }
 
       #saved-list {
-        display: grid;
-        grid-template-columns: auto auto auto;
-        gap: 14px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 10px;
       }
 
       #new-button {
         height: 20em;
+        width: 23em;
       }
 
       #new-button::part(control) {
@@ -55,18 +56,6 @@ export class AppIntro extends LitElement {
 
         #new-button {
           width: 100%;
-        }
-      }
-
-      @media (min-width: 1028px) {
-        #saved-list {
-          max-width: 80vw;
-        }
-      }
-
-      @media (max-width: 800px) and (orientation: portrait) {
-        #saved-list {
-          grid-template-columns: 50% 48%;
         }
       }
 
@@ -134,27 +123,6 @@ export class AppIntro extends LitElement {
             ? 
             this.savedSessions.map((session) => {
                 return html`
-                  <!--<fast-card>
-                    <div id="session-info">
-                      <h3>${session.date}</h3>
-                      <p>ID: ${session.session}</p>
-                    </div>
-
-                    ${ session.code ? html`<div id="code">
-                      <img .src="${URL.createObjectURL(session.code)}" alt="qr code">
-                    </div>` : null}
-
-                    <div id="card-actions">
-                      <fast-button
-                        id="share-button"
-                        @click="${() => this.share(session)}"
-                        >Share Session</fast-button
-                      >
-                      <fast-anchor href="${`/${session.session}`}"
-                        >Resume Session</fast-anchor
-                      >
-                    </div>
-                  </fast-card>-->
                   <session-item .session="${session}"></session-item>
                 `;
               })

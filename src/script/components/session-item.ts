@@ -6,6 +6,10 @@ export class SessionItem extends LitElement {
 
   static get styles() {
     return css`
+      :host {
+        width: 20em;
+      }
+
       fast-card {
         --background-color: #ffb0e0;
         padding-left: 12px;
@@ -25,6 +29,12 @@ export class SessionItem extends LitElement {
 
       #session-info h3 {
         margin-right: 10px;
+      }
+
+      #session-info p {
+        overflow: hidden;
+        white-space: nowrap;
+        text-overflow: ellipsis;
       }
 
       #card-actions {

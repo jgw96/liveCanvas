@@ -1,5 +1,25 @@
 import { get, set } from "idb-keyval";
 
+export async function deleteSession(sessionString: string) {
+  const sessions: Array<string> | null = await get("savedSessions");
+
+  if (sessions) {
+    const filtered = sessions.filter((session: any) => {
+      console.log(session);
+      return session.session !== sessionString;
+    })
+
+    if (filtered) {
+      await set("savedSessions", filtered);
+    }
+
+    return filtered;
+  }
+  else {
+    return null;
+  }
+}
+
 export async function getSavedSessions(): Promise<any[] | null> {
   const sessions: Array<string> | null = await get("savedSessions");
 

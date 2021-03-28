@@ -1,4 +1,5 @@
 import { LitElement, css, html, customElement, property } from "lit-element";
+import { deleteSession } from "../services/sessions";
 
 @customElement("session-item")
 export class SessionItem extends LitElement {
@@ -8,10 +9,15 @@ export class SessionItem extends LitElement {
     return css`
       :host {
         width: 20em;
+
+        background: paint(circles);
+        --num-circles: 40;
+        --colors: #686bd2;
       }
 
       fast-card {
-        --background-color: #ffb0e0;
+        backdrop-filter: blur(30px);
+        --background-color: #eaeaffab;
         padding-left: 12px;
         padding-right: 12px;
         padding-bottom: 12px;
@@ -39,7 +45,7 @@ export class SessionItem extends LitElement {
 
       #card-actions {
         display: flex;
-        justify-content: center;
+        justify-content: space-between;
       }
 
       #card-actions fast-anchor {
@@ -50,12 +56,16 @@ export class SessionItem extends LitElement {
         padding-right: 6px;
       }
 
-      #share-button {
-        margin-right: 8px;
+      #share-button, #delete-button {
+        margin-right: 2px;
         border-radius: 22px;
 
         padding-left: 6px;
         padding-right: 6px;
+      }
+
+      #delete-button {
+        background: red;
       }
 
       #code {
@@ -115,6 +125,19 @@ export class SessionItem extends LitElement {
     }
   }
 
+  async delete(session: string) {
+    const filtered = await deleteSession(session);
+
+    if (filtered) {
+      let event = new CustomEvent('deleted', {
+        detail: {
+          sessions: filtered
+        }
+      });
+      this.dispatchEvent(event);
+    }
+  }
+
   render() {
     return html`
       <fast-card>
@@ -126,14 +149,20 @@ export class SessionItem extends LitElement {
         <div id="code"></div>
 
         <div id="card-actions">
-          <fast-button
-            id="share-button"
-            @click="${() => this.share(this.session)}"
-            >Share Session</fast-button
-          >
-          <fast-anchor href="${`/${this.session.session}`}"
-            >Resume Session</fast-anchor
-          >
+          <fast-button @click="${() => this.delete(this.session.session)}" id="delete-button">
+            Delete
+          </fast-button>
+
+          <div>
+            <fast-button
+              id="share-button"
+              @click="${() => this.share(this.session)}"
+              >Share</fast-button
+            >
+            <fast-anchor href="${`/${this.session.session}`}"
+              >Resume</fast-anchor
+            >
+          </div>
         </div>
       </fast-card>
     `;

@@ -81,7 +81,7 @@ export class AppHeader extends LitElement {
       #settings {
         position: fixed;
         background: #ffffff9e;
-        backdrop-filter: blur(10px);
+        backdrop-filter: blur(20px);
         box-shadow: rgb(0 0 0 / 20%) -2px 1px 14px 0px;
         right: 0px;
         bottom: 0px;
@@ -196,6 +196,7 @@ export class AppHeader extends LitElement {
         {
           duration: 280,
           fill: "forwards",
+          easing: "ease-in-out"
         }
       );
 

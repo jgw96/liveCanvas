@@ -41,20 +41,18 @@ export class AppIntro extends LitElement {
       }
 
       #new-button {
-        height: 20em;
-        width: 23em;
-      }
-
-      #new-button::part(control) {
-        font-size: 1.6em;
+        position: fixed;
+        right: 16px;
+        bottom: 16px;
+        border-radius: 22px;
+        padding-left: 6px;
+        padding-right: 6px;
+        background: var(--app-color-primary);
+        width: 8em;
       }
 
       @media (max-width: 600px) {
         fast-card {
-          width: 100%;
-        }
-
-        #new-button {
           width: 100%;
         }
       }
@@ -75,6 +73,8 @@ export class AppIntro extends LitElement {
 
   constructor() {
     super();
+
+    (CSS as any).paintWorklet.addModule("https://unpkg.com/css-houdini-circles@1.0.5/dist/circles.js");
   }
 
   async firstUpdated() {
@@ -112,6 +112,14 @@ export class AppIntro extends LitElement {
     }
   }
 
+  handleDelete(ev: CustomEvent) {
+    const newSessions = ev.detail.sessions;
+
+    if (newSessions) {
+      this.savedSessions = newSessions;
+    }
+  }
+
   render() {
     return html`
       <div>
@@ -123,19 +131,19 @@ export class AppIntro extends LitElement {
             ? 
             this.savedSessions.map((session) => {
                 return html`
-                  <session-item .session="${session}"></session-item>
+                  <session-item @deleted="${(ev: CustomEvent) => this.handleDelete(ev)}" .session="${session}"></session-item>
                 `;
               })
             : null}
+        </div>
 
-          <fast-button
+        <fast-button
             appearance="accent"
             id="new-button"
             @click="${() => this.newLive()}"
           >
             New Session
           </fast-button>
-        </div>
       </div>
     `;
   }

@@ -37,7 +37,7 @@ export class AppIntro extends LitElement {
       #saved-list {
         display: flex;
         flex-wrap: wrap;
-        gap: 10px;
+        gap: 14px;
       }
 
       #new-button {
@@ -74,7 +74,9 @@ export class AppIntro extends LitElement {
   constructor() {
     super();
 
-    (CSS as any).paintWorklet.addModule("https://unpkg.com/css-houdini-circles@1.0.5/dist/circles.js");
+    if ((CSS as any).paintWorklet) {
+      (CSS as any).paintWorklet.addModule("https://unpkg.com/css-houdini-circles@1.0.5/dist/circles.js");
+    }
   }
 
   async firstUpdated() {

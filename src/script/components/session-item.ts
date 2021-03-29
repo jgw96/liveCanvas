@@ -95,6 +95,10 @@ export class SessionItem extends LitElement {
         fast-card {
           width: 94.4%;
         }
+
+        :host {
+          width: 100%;
+        }
       }
     `;
   }

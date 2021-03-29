@@ -87,9 +87,17 @@ export class AppIntro extends LitElement {
         }
       }
 
-      @media (max-width: 600px) {
+      @media (max-width: 800px) {
         fast-card {
           width: 100%;
+        }
+
+        #intro-block p {
+          width: 82vw;
+        }
+
+        #screens img {
+          width: 80vw;
         }
       }
 
@@ -102,6 +110,30 @@ export class AppIntro extends LitElement {
 
         fast-card {
           width: 94.4%;
+        }
+
+        #intro-container {
+          display: flex;
+          justify-content: space-between;
+          align-items: center;
+          gap: 54px;
+        }
+
+        #screens img {
+          width: 91%;
+        }
+      }
+
+      @media (screen-spanning: single-fold-horizontal) {
+        #saved-list {
+          gap: 12px;
+        }
+
+        #intro-container {
+          height: 90vh;
+          display: flex;
+          flex-direction: column;
+          justify-content: space-between;
         }
       }
     `;
@@ -166,21 +198,23 @@ export class AppIntro extends LitElement {
         ${this.savedSessions
           ? html`<h2>Welcome!</h2>`
           : html`
-              <div id="intro-block">
-                <h2>Welcome!</h2>
-                <p>
-                  LiveCanvas is an open source collaborative drawing app
-                  offering a simple and fast user experience. LiveCanvas can be
-                  used with anyone, simply share a link and you are ready to go!
-                  Tap "New Session" to get started!
-                </p>
-              </div>
+              <div id="intro-container">
+                <div id="intro-block">
+                  <h2>Welcome!</h2>
+                  <p>
+                    LiveCanvas is an open source collaborative drawing app
+                    offering a simple and fast user experience. LiveCanvas can
+                    be used with anyone, simply share a link and you are ready
+                    to go! Tap "New Session" to get started!
+                  </p>
+                </div>
 
-              <div id="screens">
-                <img
-                  src="/assets/screenshots/screen.png"
-                  alt="screenshot of app"
-                />
+                <div id="screens">
+                  <img
+                    src="/assets/screenshots/screen.png"
+                    alt="screenshot of app"
+                  />
+                </div>
               </div>
             `}
         ${this.savedSessions

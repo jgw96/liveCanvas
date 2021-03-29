@@ -24,7 +24,7 @@ export const setupCanvas = (canvas: HTMLCanvasElement) => {
     canvas.width = window.innerWidth;
 
     const ctx = canvas.getContext("2d", {
-      desynchronized: true,
+      desynchronized: navigator.userAgent.toLowerCase().includes("android") ? false : true,
     });
 
     if (ctx) {

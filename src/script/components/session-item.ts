@@ -13,6 +13,8 @@ export class SessionItem extends LitElement {
         background: paint(circles);
         --num-circles: 40;
         --colors: #686bd2;
+
+        margin-bottom: 14px;
       }
 
       fast-card {

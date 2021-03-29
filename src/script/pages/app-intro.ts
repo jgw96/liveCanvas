@@ -9,7 +9,7 @@ import {
 import { getSavedSessions, saveSession } from "../services/sessions";
 import { randoRoom } from "../services/utils";
 
-import '../components/session-item';
+import "../components/session-item";
 
 @customElement("app-intro")
 export class AppIntro extends LitElement {
@@ -37,7 +37,6 @@ export class AppIntro extends LitElement {
       #saved-list {
         display: flex;
         flex-wrap: wrap;
-        gap: 14px;
       }
 
       #new-button {
@@ -51,17 +50,54 @@ export class AppIntro extends LitElement {
         width: 8em;
       }
 
+      #intro-block {
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #intro-block h2 {
+        font-size: 3em;
+        margin-bottom: 0;
+      }
+
+      #intro-block p {
+        font-size: 1.4em;
+        text-align: center;
+        width: 46vw;
+      }
+
+      #screens {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+      }
+
+      #screens img {
+        width: 56vw;
+        box-shadow: 0 0 1.8rem rgb(0 0 0 / 15%);
+        border-radius: 8px;
+        margin-top: 2em;
+      }
+
+      @media (min-width: 800px) {
+        #saved-list {
+          gap: 12px;
+        }
+      }
+
       @media (max-width: 600px) {
         fast-card {
           width: 100%;
         }
       }
 
-      @media(screen-spanning: single-fold-vertical) {
+      @media (screen-spanning: single-fold-vertical) {
         #saved-list {
           display: grid;
           grid-template-columns: 50% 50%;
-          grid-gap: 30px;
+          gap: 30px;
         }
 
         fast-card {
@@ -75,7 +111,9 @@ export class AppIntro extends LitElement {
     super();
 
     if ((CSS as any).paintWorklet) {
-      (CSS as any).paintWorklet.addModule("https://unpkg.com/css-houdini-circles@1.0.5/dist/circles.js");
+      (CSS as any).paintWorklet.addModule(
+        "https://unpkg.com/css-houdini-circles@1.0.5/dist/circles.js"
+      );
     }
   }
 
@@ -125,27 +163,49 @@ export class AppIntro extends LitElement {
   render() {
     return html`
       <div>
-        <h2>Welcome!</h2>
+        ${this.savedSessions
+          ? html`<h2>Welcome!</h2>`
+          : html`
+              <div id="intro-block">
+                <h2>Welcome!</h2>
+                <p>
+                  LiveCanvas is an open source collaborative drawing app
+                  offering a simple and fast user experience. LiveCanvas can be
+                  used with anyone, simply share a link and you are ready to go!
+                  Tap "New Session" to get started!
+                </p>
+              </div>
 
-        ${this.savedSessions ? html`<h3 id="recent-header">Recent Sessions</h3>` : null}
+              <div id="screens">
+                <img
+                  src="/assets/screenshots/screen.png"
+                  alt="screenshot of app"
+                />
+              </div>
+            `}
+        ${this.savedSessions
+          ? html`<h3 id="recent-header">Recent Sessions</h3>`
+          : null}
         <div id="saved-list">
           ${this.savedSessions
-            ? 
-            this.savedSessions.map((session) => {
+            ? this.savedSessions.map((session) => {
                 return html`
-                  <session-item @deleted="${(ev: CustomEvent) => this.handleDelete(ev)}" .session="${session}"></session-item>
+                  <session-item
+                    @deleted="${(ev: CustomEvent) => this.handleDelete(ev)}"
+                    .session="${session}"
+                  ></session-item>
                 `;
               })
             : null}
         </div>
 
         <fast-button
-            appearance="accent"
-            id="new-button"
-            @click="${() => this.newLive()}"
-          >
-            New Session
-          </fast-button>
+          appearance="accent"
+          id="new-button"
+          @click="${() => this.newLive()}"
+        >
+          New Session
+        </fast-button>
       </div>
     `;
   }

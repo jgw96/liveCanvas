@@ -13,7 +13,7 @@ import "../components/session-item";
 
 @customElement("app-intro")
 export class AppIntro extends LitElement {
-  @internalProperty() savedSessions: Array<any> | undefined;
+  @internalProperty() savedSessions: Array<any> | undefined = [];
 
   static get styles() {
     return css`
@@ -23,10 +23,20 @@ export class AppIntro extends LitElement {
         padding-top: 2em;
 
         color: black;
+
+        padding: 16px;
+        background: paint(circles);
+        --num-circles: 80;
+        --min-radius: 10;
+        --max-radius: 80;
+        --colors: #686bd2, #03dac5;
+
+        height: 96vh;
       }
 
       h2 {
         font-size: 2.2em;
+        margin-top: 2em;
       }
 
       #recent-header {
@@ -40,7 +50,7 @@ export class AppIntro extends LitElement {
       }
 
       #new-button {
-        position: fixed;
+        position: absolute;
         right: 16px;
         bottom: 16px;
         border-radius: 22px;
@@ -60,6 +70,7 @@ export class AppIntro extends LitElement {
       #intro-block h2 {
         font-size: 3em;
         margin-bottom: 0;
+        margin-top: 1.2em;
       }
 
       #intro-block p {
@@ -75,7 +86,7 @@ export class AppIntro extends LitElement {
       }
 
       #screens img {
-        width: 56vw;
+        width: 48vw;
         box-shadow: 0 0 1.8rem rgb(0 0 0 / 15%);
         border-radius: 8px;
         margin-top: 2em;
@@ -98,6 +109,7 @@ export class AppIntro extends LitElement {
 
         #screens img {
           width: 80vw;
+          margin-top: 0;
         }
       }
 
@@ -122,6 +134,20 @@ export class AppIntro extends LitElement {
         #screens img {
           width: 91%;
         }
+      }
+
+      #glass {
+        background: #ffffff78;
+        position: fixed;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+        backdrop-filter: blur(32px);
+
+        padding: 16px;
+
+        overflow-y: auto;
       }
 
       @media (screen-spanning: single-fold-horizontal) {
@@ -155,6 +181,9 @@ export class AppIntro extends LitElement {
     if (sessionsData) {
       this.savedSessions = sessionsData;
       console.log("savedSessions", sessionsData);
+    }
+    else {
+      this.savedSessions = undefined;
     }
   }
 
@@ -194,53 +223,55 @@ export class AppIntro extends LitElement {
 
   render() {
     return html`
-      <div>
-        ${this.savedSessions
-          ? html`<h2>Welcome!</h2>`
-          : html`
-              <div id="intro-container">
-                <div id="intro-block">
-                  <h2>Welcome!</h2>
-                  <p>
-                    LiveCanvas is an open source collaborative drawing app
-                    offering a simple and fast user experience. LiveCanvas can
-                    be used with anyone, simply share a link and you are ready
-                    to go! Tap "New Session" to get started!
-                  </p>
-                </div>
-
-                <div id="screens">
-                  <img
-                    src="/assets/screenshots/screen.png"
-                    alt="screenshot of app"
-                  />
-                </div>
-              </div>
-            `}
-        ${this.savedSessions
-          ? html`<h3 id="recent-header">Recent Sessions</h3>`
-          : null}
-        <div id="saved-list">
+      <div id="glass">
+        <div>
           ${this.savedSessions
-            ? this.savedSessions.map((session) => {
-                return html`
-                  <session-item
-                    @deleted="${(ev: CustomEvent) => this.handleDelete(ev)}"
-                    .session="${session}"
-                  ></session-item>
-                `;
-              })
-            : null}
-        </div>
+            ? html`<h2>Welcome!</h2>`
+            : html`
+                <div id="intro-container">
+                  <div id="intro-block">
+                    <h2>Welcome!</h2>
+                    <p>
+                      LiveCanvas is an open source collaborative drawing app
+                      offering a simple and fast user experience. LiveCanvas can
+                      be used with anyone, simply share a link and you are ready
+                      to go! Tap "New Session" to get started!
+                    </p>
+                  </div>
 
-        <fast-button
-          appearance="accent"
-          id="new-button"
-          @click="${() => this.newLive()}"
-        >
-          New Session
-        </fast-button>
+                  <div id="screens">
+                    <img
+                      src="/assets/screenshots/screen.png"
+                      alt="screenshot of app"
+                    />
+                  </div>
+                </div>
+              `}
+          ${this.savedSessions
+            ? html`<h3 id="recent-header">Recent Sessions</h3>`
+            : null}
+          <div id="saved-list">
+            ${this.savedSessions
+              ? this.savedSessions.map((session) => {
+                  return html`
+                    <session-item
+                      @deleted="${(ev: CustomEvent) => this.handleDelete(ev)}"
+                      .session="${session}"
+                    ></session-item>
+                  `;
+                })
+              : null}
+          </div>
+        </div>
       </div>
+
+      <fast-button
+            appearance="accent"
+            id="new-button"
+            @click="${() => this.newLive()}"
+          >
+            New Session
+          </fast-button>
     `;
   }
 }

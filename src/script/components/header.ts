@@ -1,5 +1,3 @@
-import { clear, set } from "idb-keyval";
-
 import {
   LitElement,
   css,
@@ -8,9 +6,6 @@ import {
   property,
   internalProperty,
 } from "lit-element";
-
-
-import { getAccount, login, logout } from "../services/auth";
 
 @customElement("app-header")
 export class AppHeader extends LitElement {
@@ -30,7 +25,8 @@ export class AppHeader extends LitElement {
         padding-right: 16px;
         color: var(--app-color-primary);
         height: 3.6em;
-        background: white;
+        background: #ffffff85;
+        backdrop-filter: blur(23px);
 
         position: fixed;
         left: 0;
@@ -123,7 +119,8 @@ export class AppHeader extends LitElement {
         padding-right: 6px;
       }
 
-      #loginButton, #logoutButton {
+      #loginButton,
+      #logoutButton {
         display: flex;
         align-items: center;
         padding-left: 6px;
@@ -142,35 +139,45 @@ export class AppHeader extends LitElement {
   }
 
   async firstUpdated() {
-    const account = await getAccount();
-    console.log(account);
-    if (account) {
-      this.userData = account;
+    (window as any).requestIdleCallback(async () => {
+      const module = await import("../services/auth");
+      const account = await module.getAccount();
+      if (account) {
+        this.userData = account;
 
-      await set('userData', account);
-    }
-    else {
-      // delay and try again
-      setTimeout(async () => {
-        const account = await getAccount();
-        console.log(account);
-        if (account) {
-          this.userData = account;
+        const module = await import('idb-keyval');
 
-          await set('userData', account);
-        }
-      }, 2000);
-    }
+        await module.set("userData", account);
+      } else {
+        // delay and try again
+        setTimeout(async () => {
+          const account = await module.getAccount();
+          console.log(account);
+          if (account) {
+            this.userData = account;
+
+            const module = await import('idb-keyval');
+
+            await module.set("userData", account);
+          }
+        }, 2000);
+      }
+    }, {
+      timeout: 800
+    });
   }
 
   async login() {
-    await login();
-    const account = await getAccount();
+    const module = await import("../services/auth");
+
+    await module.login();
+    const account = await module.getAccount();
     console.log(account);
 
     this.userData = account;
 
-    await set('userData', account);
+    const idb = await import('idb-keyval');
+    await idb.set("userData", account);
   }
 
   async settings() {
@@ -196,13 +203,12 @@ export class AppHeader extends LitElement {
         {
           duration: 280,
           fill: "forwards",
-          easing: "ease-in-out"
+          easing: "ease-in-out",
         }
       );
 
       console.log(this.ani);
     } else {
-      console.log("here reverse", this.ani);
       this.ani?.reverse();
 
       if (this.ani) {
@@ -215,12 +221,15 @@ export class AppHeader extends LitElement {
 
   async handleLogout() {
     try {
-      await logout();
-      await clear();
+      const module = await import("../services/auth");
+
+      await module.logout();
+
+      const idb = await import('idb-keyval');
+      await idb.clear();
 
       this.userData = null;
-    }
-    catch (err) {
+    } catch (err) {
       console.error(err);
     }
   }
@@ -231,14 +240,23 @@ export class AppHeader extends LitElement {
         <h1>LiveCanvas</h1>
 
         <div id="settingsBlock">
-        <fast-button @click="${() =>
-          this.settings()}" appearance="lightweight" id="settingsButton"><img src="/assets/settings-outline.svg" alt="settings icon"></fast-button>
+        <!--<fast-button @click="${() =>
+          this.settings()}" appearance="lightweight" id="settingsButton"><img src="/assets/settings-outline.svg" alt="settings icon"></fast-button>-->
 
         ${
           !this.userData
-            ? html`<fast-button id="loginButton" appearance="accent" @click="${() => this.login()}">Login</fast-button>`
+            ? html`<fast-button
+                id="loginButton"
+                appearance="accent"
+                @click="${() => this.login()}"
+                >Login</fast-button
+              >`
             : html`
-                <fast-button id="logoutButton" @click="${() => this.handleLogout()}" id="avatar">
+                <fast-button
+                  id="logoutButton"
+                  @click="${() => this.handleLogout()}"
+                  id="avatar"
+                >
                   <p>Logout</p>
                 </fast-button>
               `

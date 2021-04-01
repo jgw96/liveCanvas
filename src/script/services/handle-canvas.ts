@@ -1,16 +1,15 @@
-import { fileSave, FileSystemHandle } from "browser-fs-access";
 import { get, set } from "idb-keyval";
 
 let pickedColor: string | undefined;
 let pickedMode: 'pen' | 'erase' = "pen";
 let cursorContext: ImageBitmapRenderingContext | null;
-let handle: FileSystemHandle | undefined;
+let handle: any | undefined;
 let offscreen: OffscreenCanvas | undefined;
 let offscreenContext: OffscreenCanvasRenderingContext2D | null;
 let thirdCanvas: HTMLCanvasElement | undefined;
 let thirdContext: CanvasRenderingContext2D | null;
 
-export const setHandle = async (handle: FileSystemHandle) => {
+export const setHandle = async (handle: any) => {
   if (handle) {
     console.log('set handle', handle);
     handle = handle;
@@ -18,7 +17,7 @@ export const setHandle = async (handle: FileSystemHandle) => {
   }
 }
 
-export const setupCanvas = (canvas: HTMLCanvasElement) => {
+export const setupCanvas = async (canvas: HTMLCanvasElement): Promise<CanvasRenderingContext2D | null> => {
   if (canvas) {
     canvas.height = window.innerHeight;
     canvas.width = window.innerWidth;
@@ -222,6 +221,8 @@ export const handleEvents = async (
             }
 
             (window as any).requestIdleCallback(async () => {
+              const fileModule = await import('browser-fs-access');
+
               if (canvas) {
                 let canvasState = canvas.toDataURL();
                 await set("canvasState", canvasState);
@@ -229,7 +230,7 @@ export const handleEvents = async (
                 if (handle) {
                   canvas.toBlob(async (blob) => {
                     if (blob) {
-                      await fileSave(blob, {}, handle);
+                      await fileModule.fileSave(blob, {}, handle);
                     }
                   })
                 }

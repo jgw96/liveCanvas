@@ -18,7 +18,6 @@ import {
   resetCursorCanvas,
   setupCanvas,
 } from "../services/handle-canvas";
-import { fileSave, FileSystemHandle } from "browser-fs-access";
 import { get } from "idb-keyval";
 
 declare var io: any;
@@ -32,7 +31,7 @@ export class AppHome extends LitElement {
   @property({ type: Boolean }) showToast: boolean = false;
   @property({ type: Boolean }) endPrompt: boolean = false;
 
-  @internalProperty() handle: FileSystemHandle | undefined;
+  @internalProperty() handle: any | undefined;
 
   @internalProperty() showCopyToast: boolean = false;
 
@@ -42,6 +41,10 @@ export class AppHome extends LitElement {
 
   static get styles() {
     return css`
+      :host {
+        padding: 16px;
+      }
+
       canvas {
         position: absolute;
         top: 0;
@@ -397,7 +400,7 @@ export class AppHome extends LitElement {
   }
 
   async firstUpdated() {
-    this.setupCanvas();
+    await this.setupCanvas();
 
     if (location.pathname.length > 1 || location.search === "?startLive") {
       // in room
@@ -463,10 +466,14 @@ export class AppHome extends LitElement {
     }
   }
 
-  setupCanvas() {
+  async setupCanvas() {
     const canvas = this.shadowRoot?.querySelector("canvas");
     if (canvas) {
-      this.ctx = setupCanvas(canvas);
+      const possibleCtx = await setupCanvas(canvas);
+
+      if (possibleCtx) {
+        this.ctx = possibleCtx;
+      }
     }
   }
 
@@ -603,6 +610,8 @@ export class AppHome extends LitElement {
   async handleSave() {
     const canvas = this.shadowRoot?.querySelector("canvas");
 
+    const fileModule = await import('browser-fs-access');
+
     const options = {
       fileName: "Untitled.png",
       extensions: [".png"],
@@ -612,14 +621,14 @@ export class AppHome extends LitElement {
       if (this.handle) {
         canvas.toBlob(async (blob) => {
           if (blob) {
-            this.handle = await fileSave(blob, options, this.handle);
+            this.handle = await fileModule.fileSave(blob, options, this.handle);
           }
         })
       }
       else {
         canvas.toBlob(async (blob) => {
           if (blob) {
-            this.handle = await fileSave(blob, options);
+            this.handle = await fileModule.fileSave(blob, options);
           }
         })
       }

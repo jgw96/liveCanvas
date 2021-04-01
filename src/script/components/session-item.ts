@@ -1,5 +1,4 @@
 import { LitElement, css, html, customElement, property } from "lit-element";
-import { deleteSession } from "../services/sessions";
 
 @customElement("session-item")
 export class SessionItem extends LitElement {
@@ -10,16 +9,11 @@ export class SessionItem extends LitElement {
       :host {
         width: 20em;
 
-        background: paint(circles);
-        --num-circles: 40;
-        --colors: #686bd2;
-
         margin-bottom: 14px;
       }
 
       fast-card {
-        backdrop-filter: blur(30px);
-        --background-color: #eaeaffab;
+        --background-color: white;
         padding-left: 12px;
         padding-right: 12px;
         padding-bottom: 12px;
@@ -27,6 +21,8 @@ export class SessionItem extends LitElement {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
+
+        border-radius: 8px;
       }
 
       #session-info {
@@ -77,6 +73,8 @@ export class SessionItem extends LitElement {
         justify-content: end;
         align-items: center;
         justify-content: center;
+
+        height: 128px;
       }
 
       @media (max-width: 600px) {
@@ -100,6 +98,7 @@ export class SessionItem extends LitElement {
 
         :host {
           width: 100%;
+          margin: 0;
         }
       }
     `;
@@ -110,13 +109,17 @@ export class SessionItem extends LitElement {
   }
 
   firstUpdated() {
-    new (window as any).QRCode(this.shadowRoot?.querySelector("#code"), {
-      text: `/${this.session.session}`,
-      width: 128,
-      height: 128,
-      colorDark: "#000000",
-      colorLight: "#ffffff",
-    });
+    (window as any).requestIdleCallback(() => {
+      new (window as any).QRCode(this.shadowRoot?.querySelector("#code"), {
+        text: `https://www.live-canvas.app/${this.session.session}`,
+        width: 128,
+        height: 128,
+        colorDark: "#000000",
+        colorLight: "#ffffff",
+      });
+    }, {
+      timeout: 800
+    })
   }
 
   async share(session: any) {
@@ -132,7 +135,8 @@ export class SessionItem extends LitElement {
   }
 
   async delete(session: string) {
-    const filtered = await deleteSession(session);
+    const module = await import("../services/sessions");
+    const filtered = await module.deleteSession(session);
 
     if (filtered) {
       let event = new CustomEvent('deleted', {

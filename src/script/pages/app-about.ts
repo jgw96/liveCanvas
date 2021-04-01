@@ -6,6 +6,9 @@ export class AppAbout extends LitElement {
 
   static get styles() {
     return css`
+      :host {
+        padding: 16px;
+      }
     `;
   }
 

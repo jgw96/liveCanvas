@@ -241,7 +241,7 @@ export class AppIntro extends LitElement {
 
                   <div id="screens">
                     <img
-                      src="/assets/screenshots/screen.png"
+                      src="/assets/screenshots/screen.webp"
                       alt="screenshot of app"
                     />
                   </div>

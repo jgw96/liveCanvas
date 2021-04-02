@@ -1,13 +1,16 @@
-import { LitElement, css, html, customElement, property } from "lit-element";
+import { LitElement, css, html, customElement, property, internalProperty } from "lit-element";
 
 @customElement("session-item")
 export class SessionItem extends LitElement {
   @property({ type: Object }) session: any = null;
 
+  @internalProperty() codeGenerated: boolean = false;
+
   static get styles() {
     return css`
       :host {
-        width: 20em;
+        width: 24em;
+        min-height: 8em;
 
         margin-bottom: 14px;
       }
@@ -54,7 +57,7 @@ export class SessionItem extends LitElement {
         padding-right: 6px;
       }
 
-      #share-button, #delete-button {
+      #share-button, #delete-button, #qr-button {
         margin-right: 2px;
         border-radius: 22px;
 
@@ -109,17 +112,21 @@ export class SessionItem extends LitElement {
   }
 
   firstUpdated() {
-    (window as any).requestIdleCallback(() => {
-      new (window as any).QRCode(this.shadowRoot?.querySelector("#code"), {
-        text: `https://www.live-canvas.app/${this.session.session}`,
-        width: 128,
-        height: 128,
-        colorDark: "#000000",
-        colorLight: "#ffffff",
-      });
-    }, {
-      timeout: 800
-    })
+
+  }
+
+  async generateCode() {
+    this.codeGenerated = true;
+
+    await this.updateComplete;
+
+    new (window as any).QRCode(this.shadowRoot?.querySelector("#code"), {
+      text: `https://www.live-canvas.app/${this.session.session}`,
+      width: 128,
+      height: 128,
+      colorDark: "#000000",
+      colorLight: "#ffffff",
+    });
   }
 
   async share(session: any) {
@@ -156,7 +163,7 @@ export class SessionItem extends LitElement {
           <p>ID: ${this.session.session}</p>
         </div>
 
-        <div id="code"></div>
+        ${this.codeGenerated ? html`<div id="code"></div>` : null}
 
         <div id="card-actions">
           <fast-button @click="${() => this.delete(this.session.session)}" id="delete-button">
@@ -169,6 +176,11 @@ export class SessionItem extends LitElement {
               @click="${() => this.share(this.session)}"
               >Share</fast-button
             >
+
+            <fast-button ?disabled="${this.codeGenerated}" id="qr-button" @click="${() => this.generateCode()}">
+              QR Code
+            </fast-button>
+
             <fast-anchor href="${`/${this.session.session}`}"
               >Resume</fast-anchor
             >

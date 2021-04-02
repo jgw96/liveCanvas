@@ -80,7 +80,7 @@ export class SessionItem extends LitElement {
         height: 128px;
       }
 
-      @media (max-width: 600px) {
+      @media (max-width: 770px) {
         fast-card {
           width: 100%;
         }
@@ -91,6 +91,14 @@ export class SessionItem extends LitElement {
 
         #new-button {
           width: 100%;
+        }
+      }
+
+      @media(max-width: 420px) {
+        #share-button, #delete-button, #qr-button {
+          padding-left: initial;
+          padding-right: initial;
+          margin-right: initial;
         }
       }
 

@@ -25,39 +25,34 @@ export class AppIntro extends LitElement {
         color: black;
 
         padding: 16px;
-        background: paint(circles);
-        --num-circles: 80;
-        --min-radius: 10;
-        --max-radius: 80;
-        --colors: #686bd2, #03dac5;
 
         height: 96vh;
       }
 
+      #welcomeBlock {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-top: 2em;
+      }
+
       h2 {
         font-size: 2.2em;
-        margin-top: 2em;
       }
 
       #recent-header {
         font-size: 1.4em;
-        color: var(--app-color-primary);
-      }
-
-      #saved-list {
-        display: flex;
-        flex-wrap: wrap;
       }
 
       #new-button {
-        position: absolute;
+       /* position: absolute;
         right: 16px;
         bottom: 16px;
         border-radius: 22px;
         padding-left: 6px;
         padding-right: 6px;
         background: var(--app-color-primary);
-        width: 8em;
+        width: 8em;*/
       }
 
       #intro-block {
@@ -94,12 +89,14 @@ export class AppIntro extends LitElement {
 
       @media (min-width: 800px) {
         #saved-list {
-          gap: 12px;
+          display: grid;
+          grid-template-columns: 32.33% 32.33% 32.33%;
+          gap: 1%;
         }
       }
 
       @media (max-width: 800px) {
-        fast-card {
+        fluent-card {
           width: 100%;
         }
 
@@ -120,7 +117,7 @@ export class AppIntro extends LitElement {
           gap: 30px;
         }
 
-        fast-card {
+        fluent-card {
           width: 94.4%;
         }
 
@@ -137,13 +134,13 @@ export class AppIntro extends LitElement {
       }
 
       #glass {
-        background: #ffffff78;
         position: fixed;
         top: 0;
         bottom: 0;
         left: 0;
         right: 0;
         backdrop-filter: blur(32px);
+        background: rgb(255 255 255 / 70%);
 
         padding: 16px;
 
@@ -226,7 +223,17 @@ export class AppIntro extends LitElement {
       <div id="glass">
         <div>
           ${this.savedSessions
-            ? html`<h2>Welcome!</h2>`
+            ? html`<div id="welcomeBlock">
+              <h2>Welcome!</h2>
+
+              <fluent-button
+                appearance="accent"
+                id="new-button"
+                @click="${() => this.newLive()}"
+              >
+                New Session
+              </fluent-button>
+            </div>`
             : html`
                 <div id="intro-container">
                   <div id="intro-block">
@@ -237,6 +244,14 @@ export class AppIntro extends LitElement {
                       be used with anyone, simply share a link and you are ready
                       to go! Tap "New Session" to get started!
                     </p>
+
+                    <fluent-button
+                      appearance="accent"
+                      id="new-button"
+                      @click="${() => this.newLive()}"
+                    >
+                      New Session
+                    </fluent-button>
                   </div>
 
                   <div id="screens">
@@ -264,14 +279,6 @@ export class AppIntro extends LitElement {
           </div>
         </div>
       </div>
-
-      <fast-button
-            appearance="accent"
-            id="new-button"
-            @click="${() => this.newLive()}"
-          >
-            New Session
-          </fast-button>
     `;
   }
 }

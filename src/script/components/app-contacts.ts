@@ -80,17 +80,17 @@ export class AppContacts extends LitElement {
           background: #ffffff;
         }
       }
-      #contactsList fast-menu-item {
+      #contactsList fluent-menu-item {
         margin-top: 10px;
         background: transparent;
       }
-      #contactsList fast-menu-item::part(content) {
+      #contactsList fluent-menu-item::part(content) {
         width: 100%;
         display: flex;
         align-items: center;
         justify-content: space-between;
       }
-      #contactsList ul fast-button {
+      #contactsList ul fluent-button {
         height: 2em;
         border: solid 1px var(--app-color-primary);
         margin-bottom: 6px;
@@ -100,13 +100,16 @@ export class AppContacts extends LitElement {
         position: fixed;
         bottom: 16px;
         right: 16px;
-        background: var(--app-color-secondary);
         color: white;
         border: none;
         font-size: 16px;
         border-radius: 50%;
         width: 48px;
         height: 48px;
+      }
+
+      #contactsButton img {
+        color: white;
       }
 
       #contactsButton img, #contactsHeader img {
@@ -216,33 +219,33 @@ export class AppContacts extends LitElement {
 
   render() {
     return html`
-      <fast-button id="contactsButton" @click="${() => this.selectContacts()}">
+      <fluent-button id="contactsButton" appearance="accent" @click="${() => this.selectContacts()}">
         <img src="/assets/share.svg" alt="share icon">
-      </fast-button>
+      </fluent-button>
       ${this.graphContacts
         ? html`<div id="contactsBlock">
             <div id="contactsList">
               <div id="contactsHeader">
                 <h3>Frequent Contacts</h3>
-                <fast-button id="closeButton" appearance="lightweight" @click="${() => this.close()}">
+                <fluent-button id="closeButton" appearance="lightweight" @click="${() => this.close()}">
                   <img src="/assets/close.svg" alt="close icon">
-                </fast-button>
+                </fluent-button>
               </div>
               <ul>
                 ${this.graphContacts.map((contact) => {
                   return html`
-                    <fast-menu-item>
+                    <fluent-menu-item>
                       <div class="contactInfo">
                         <span class="displayName">${contact.displayName}</span>
                         <span class="displayEmail"
                           >Address: ${contact.emailAddresses[0].address}</span
                         >
                       </div>
-                      <fast-button
+                      <fluent-button
                         @click="${() => this.handleResults([contact])}"
-                        >Select</fast-button
+                        >Select</fluent-button
                       >
-                    </fast-menu-item>
+                    </fluent-menu-item>
                   `;
                 })}
               </ul>

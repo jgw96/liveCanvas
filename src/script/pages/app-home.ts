@@ -224,15 +224,15 @@ export class AppHome extends LitElement {
         animation-duration: 400ms;
       }
 
-      fast-button {
+      fluent-button {
         border-radius: 22px;
       }
 
-      #sessionToast fast-button {
+      #sessionToast fluent-button {
         margin-left: 14px;
       }
 
-      #sessionToast fast-button::part(control) {
+      #sessionToast fluent-button::part(control) {
         font-weight: bold;
       }
 
@@ -311,7 +311,7 @@ export class AppHome extends LitElement {
         padding-right: 0;
       }
 
-      #endPromptActions fast-button {
+      #endPromptActions fluent-button {
         width: 5em;
       }
 
@@ -689,8 +689,8 @@ export class AppHome extends LitElement {
             <div id="sessionToast">
               You have started a new session
 
-              <fast-button appearance="lightweight" @click="${this.share}"
-                >Invite</fast-button
+              <fluent-button appearance="lightweight" @click="${this.share}"
+                >Invite</fluent-button
               >
             </div>
           `
@@ -705,12 +705,12 @@ export class AppHome extends LitElement {
                 <h2>End Session?</h2>
 
                 <div id="endPromptActions">
-                  <fast-button @click="${this.no}">No</fast-button>
-                  <fast-button
+                  <fluent-button @click="${this.no}">No</fluent-button>
+                  <fluent-button
                     id="end-button"
                     appearance="accent"
                     @click="${this.end}"
-                    >End</fast-button
+                    >End</fluent-button
                   >
                 </div>
               </div>
@@ -722,14 +722,15 @@ export class AppHome extends LitElement {
             <img src="/assets/close.svg" alt="close session" />
           </button>`
         : null}
+        
       ${location.pathname.length === 1
-        ? html`<fast-button
+        ? html`<fluent-button
             appearance="accent"
             id="newLive"
             @click="${this.newLive}"
           >
             <img src="/assets/add.svg" alt="add icon" />
-            <span>New Session</span></fast-button
+            <span>New Session</span></fluent-button
           >`
         : html`<app-contacts id="shareRoom"
         @got-contacts="${(ev: CustomEvent) => this.handleContacts(ev)}"

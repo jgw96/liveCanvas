@@ -23,7 +23,6 @@ export class AppHeader extends LitElement {
         align-items: center;
         padding-left: 16px;
         padding-right: 16px;
-        color: var(--app-color-primary);
         height: 3.6em;
         background: #ffffff85;
         backdrop-filter: blur(23px);
@@ -125,8 +124,8 @@ export class AppHeader extends LitElement {
         align-items: center;
         padding-left: 6px;
         padding-right: 6px;
-        border-radius: 22px;
-        width: 5em;
+
+        color: black;
       }
 
       @media (max-width: 800px) {
@@ -245,20 +244,20 @@ export class AppHeader extends LitElement {
 
         ${
           !this.userData
-            ? html`<fast-button
+            ? html`<fluent-button
                 id="loginButton"
-                appearance="accent"
+                appearance="outline"
                 @click="${() => this.login()}"
-                >Login</fast-button
+                >Login</fluent-button
               >`
             : html`
-                <fast-button
+                <fluent-button
                   id="logoutButton"
                   @click="${() => this.handleLogout()}"
                   id="avatar"
                 >
                   <p>Logout</p>
-                </fast-button>
+                </fluent-button>
               `
         }
         </div>

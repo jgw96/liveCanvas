@@ -17,7 +17,7 @@ body {
   margin: 0;
 }
 
-fast-design-system-provider {
+fluent-design-system-provider {
   --background-color: white;
   color: black;
   --neutral-foreground-rest: #e5e5e5;
@@ -28,8 +28,4 @@ fast-design-system-provider {
   --neutral-fill-rest: #5d5d5d;
 
   --neutral-fill-input-active: #e5e5e5;
-
-  --accent-fill-rest: #686bd2;
-  --accent-fill-hover: #4a4d98;
-  --accent-fill-active: #686bd2;
 }

@@ -95,6 +95,8 @@ export const handleEvents = async (
         for (const pointer of changedPointers) {
           const previous = previousPointers.find((p) => p.id === pointer.id);
 
+          console.log('nativePointer', pointer.nativePointer);
+
           if (ctx && previous) {
             ctx.strokeStyle = pickedColor || color;
 

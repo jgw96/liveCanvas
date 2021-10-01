@@ -9,13 +9,12 @@ export class SessionItem extends LitElement {
   static get styles() {
     return css`
       :host {
-        width: 24em;
         min-height: 8em;
 
         margin-bottom: 14px;
       }
 
-      fast-card {
+      fluent-card {
         --background-color: white;
         padding-left: 12px;
         padding-right: 12px;
@@ -51,7 +50,6 @@ export class SessionItem extends LitElement {
 
       #card-actions fast-anchor {
         background-color: var(--app-color-primary);
-        border-radius: 22px;
 
         padding-left: 6px;
         padding-right: 6px;
@@ -59,7 +57,6 @@ export class SessionItem extends LitElement {
 
       #share-button, #delete-button, #qr-button {
         margin-right: 2px;
-        border-radius: 22px;
 
         padding-left: 6px;
         padding-right: 6px;
@@ -67,6 +64,7 @@ export class SessionItem extends LitElement {
 
       #delete-button {
         background: red;
+        color: white;
       }
 
       #code {
@@ -80,9 +78,10 @@ export class SessionItem extends LitElement {
         height: 128px;
       }
 
-      @media (max-width: 770px) {
-        fast-card {
+      @media (max-width: 800px) {
+        fluent-card {
           width: 100%;
+          margin-bottom: 10px;
         }
 
         :host {
@@ -103,7 +102,7 @@ export class SessionItem extends LitElement {
       }
 
       @media (screen-spanning: single-fold-vertical) {
-        fast-card {
+        fluent-card {
           width: 94.4%;
         }
 
@@ -165,7 +164,7 @@ export class SessionItem extends LitElement {
 
   render() {
     return html`
-      <fast-card>
+      <fluent-card>
         <div id="session-info">
           <h3>${this.session.date}</h3>
           <p>ID: ${this.session.session}</p>
@@ -174,27 +173,27 @@ export class SessionItem extends LitElement {
         ${this.codeGenerated ? html`<div id="code"></div>` : null}
 
         <div id="card-actions">
-          <fast-button @click="${() => this.delete(this.session.session)}" id="delete-button">
+          <fluent-button @click="${() => this.delete(this.session.session)}" id="delete-button">
             Delete
-          </fast-button>
+          </fluent-button>
 
           <div>
-            <fast-button
+            <fluent-button
               id="share-button"
               @click="${() => this.share(this.session)}"
-              >Share</fast-button
+              >Share</fluent-button
             >
 
-            <fast-button ?disabled="${this.codeGenerated}" id="qr-button" @click="${() => this.generateCode()}">
+            <!--<fast-button ?disabled="${this.codeGenerated}" id="qr-button" @click="${() => this.generateCode()}">
               QR Code
-            </fast-button>
+            </fast-button>-->
 
-            <fast-anchor href="${`/${this.session.session}`}"
-              >Resume</fast-anchor
+            <fluent-anchor appearance="accent" href="${`/${this.session.session}`}"
+              >Resume</fluent-anchor
             >
           </div>
         </div>
-      </fast-card>
+      </fluent-card>
     `;
   }
 }

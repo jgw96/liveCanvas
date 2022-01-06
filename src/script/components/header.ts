@@ -24,12 +24,6 @@ export class AppHeader extends LitElement {
         padding-left: 16px;
         padding-right: 16px;
         height: 3.6em;
-        background: #ffffff85;
-        backdrop-filter: blur(23px);
-
-        position: fixed;
-        left: 0;
-        right: 0;
         z-index: 99999;
       }
 
@@ -120,7 +114,7 @@ export class AppHeader extends LitElement {
 
       #loginButton,
       #logoutButton {
-        display: flex;
+        display: none;
         align-items: center;
         padding-left: 6px;
         padding-right: 6px;
@@ -244,20 +238,20 @@ export class AppHeader extends LitElement {
 
         ${
           !this.userData
-            ? html`<fluent-button
+            ? html`<sl-button
                 id="loginButton"
                 appearance="outline"
                 @click="${() => this.login()}"
-                >Login</fluent-button
+                >Login</sl-button
               >`
             : html`
-                <fluent-button
+                <sl-button
                   id="logoutButton"
                   @click="${() => this.handleLogout()}"
                   id="avatar"
                 >
                   <p>Logout</p>
-                </fluent-button>
+                </sl-button>
               `
         }
         </div>

@@ -1,11 +1,9 @@
-import { LitElement, css, html, customElement, property } from 'lit-element';
-import { getDevices } from '../services/graph-api';
+import { LitElement, css, html, customElement, property } from "lit-element";
+import { getDevices } from "../services/graph-api";
 
-
-@customElement('app-toolbar')
+@customElement("app-toolbar")
 export class AppToolbar extends LitElement {
-
-  @property({ type: String }) activeMode: string = 'pen';
+  @property({ type: String }) activeMode: string = "pen";
   @property({ type: Boolean }) showModeToast: boolean = false;
   @property({ type: Boolean }) confirmDelete: boolean = false;
 
@@ -25,10 +23,20 @@ export class AppToolbar extends LitElement {
         animation-duration: 280ms;
       }
 
+      @media (prefers-color-scheme: dark) {
+        :host {
+          background-color: var(--sl-color-neutral-0);
+          box-shadow: none;
+          border-color: var(--sl-color-neutral-300);
+          border-style: solid;
+          border-width: var(--sl-input-border-width);
+        }
+      }
+
       button {
-        height: 28px;
+        height: 40px;
         border-radius: 50%;
-        width: 28px;
+        width: 40px;
         border: solid 2px black;
         cursor: pointer;
       }
@@ -58,14 +66,33 @@ export class AppToolbar extends LitElement {
         background: black;
       }
 
-      #penButton, #eraserButton, #clearButton, #saveButton, #presentButton {
+      #penButton,
+      #eraserButton,
+      #clearButton,
+      #saveButton,
+      #presentButton {
         display: flex;
         align-items: center;
         justify-content: center;
         border: none;
       }
 
-      #penButton img, #eraserButton img, #clearButton img, #saveButton img, #presentButton img {
+      @media (prefers-color-scheme: dark) {
+        #penButton,
+        #eraserButton,
+        #clearButton,
+        #saveButton,
+        #presentButton {
+          background: black;
+          color: white;
+        }
+      }
+
+      #penButton img,
+      #eraserButton img,
+      #clearButton img,
+      #saveButton img,
+      #presentButton img {
         height: 18px;
         width: 18px;
       }
@@ -73,26 +100,7 @@ export class AppToolbar extends LitElement {
       #innerBlock {
         display: flex;
         justify-content: space-between;
-        width: 18em;
-      }
-
-      #modeToast {
-        position: fixed;
-        bottom: 14px;
-        right: 20%;
-        left: 20%;
-        background: var(--app-color-primary);
-        color: white;
-        padding: 12px;
-        border-radius: 6px;
-        display: flex;
-        align-items: center;
-        justify-content: center;
-        font-weight: bold;
-        box-shadow: rgba(104, 107, 210, 0.38) 0px 0px 10px 4px;
-
-        animation-name: fadein;
-        animation-duration: 200ms;
+        width: 28em;
       }
 
       #endPromptContainer {
@@ -109,7 +117,6 @@ export class AppToolbar extends LitElement {
         animation-duration: 300ms;
       }
 
-      
       #endPrompt {
         background: white;
         width: 20em;
@@ -140,7 +147,7 @@ export class AppToolbar extends LitElement {
         padding-right: 0;
       }
 
-      #endPromptActions fluent-button {
+      #endPromptActions sl-button {
         width: 5em;
       }
 
@@ -177,16 +184,11 @@ export class AppToolbar extends LitElement {
         width: 4em;
       }
 
-      @media(min-width: 800px) {
-        #modeToast {
-          right: 40%;
-          left: 40%;
-        }
-
+      @media (min-width: 800px) {
         #innerBlock {
           flex-direction: column;
-          min-height: 19em;
-          width: 2em;
+          width: 2.8em;
+          height: 26em;
           padding-top: 8px;
           padding-bottom: 8px;
           justify-content: space-between;
@@ -194,16 +196,31 @@ export class AppToolbar extends LitElement {
         }
       }
 
-      @media(max-width: 420px) {
+      @media (max-width: 545px) {
         :host {
-          right: 16px;
+          left: 0;
+          bottom: 0;
+          border: none;
 
-          padding-left: 16px;
-          padding-right: 16px;
+          padding-left: 6px;
+          padding-right: 6px;
+          border-radius: 0px 20px 0px 0px;
         }
 
         #innerBlock {
           width: 100%;
+          flex-direction: column;
+          height: 100%;
+          justify-content: flex-end;
+          gap: 10px;
+        }
+      }
+
+      @media(horizontal-viewport-segments: 2) {
+        sl-dialog::part(panel) {
+          right: 21px;
+          left: initial;
+          position: fixed;
         }
       }
 
@@ -222,65 +239,76 @@ export class AppToolbar extends LitElement {
     super();
   }
 
+  handleColor() {
+    const color = (this.shadowRoot?.querySelector("sl-color-picker") as any)?.value;
+
+    let event = new CustomEvent("color-picked", {
+      detail: {
+        color,
+      },
+    });
+    this.dispatchEvent(event);
+  }
+
   pickColor(color: string) {
     console.log(color);
 
-    let event = new CustomEvent('color-picked', {
+    let event = new CustomEvent("color-picked", {
       detail: {
-        color
-      }
+        color,
+      },
     });
     this.dispatchEvent(event);
   }
 
   penMode(mode: string) {
-    console.log('mode', mode);
-    let event = new CustomEvent('mode-picked', {
+    console.log("mode", mode);
+    let event = new CustomEvent("mode-picked", {
       detail: {
-        mode
-      }
+        mode,
+      },
     });
     this.dispatchEvent(event);
 
     this.activeMode = mode;
 
-    // show toast
-    this.showModeToast = true;
-
-    setTimeout(() => {
-      this.showModeToast = false;
-    }, 2000);
+    const modeToast: any = this.shadowRoot?.querySelector("#modeToast");
+    modeToast?.toast();
   }
 
   clear() {
-    this.confirmDelete = false;
+    this.cancel();
 
-    let event = new CustomEvent('clear-picked', {
-      detail: {
-        
-      }
+    let event = new CustomEvent("clear-picked", {
+      detail: {},
     });
     this.dispatchEvent(event);
   }
 
   clearPrompt() {
-    this.confirmDelete = !this.confirmDelete;
+    const dialog = this.shadowRoot?.querySelector("#clearCanvasDialog");
+    (dialog as any).show();
+  }
+
+  cancel() {
+    const dialog = this.shadowRoot?.querySelector("#clearCanvasDialog");
+    (dialog as any).hide();
   }
 
   save() {
-    let event = new CustomEvent('save-picked', {
-      detail: {}
-    })
+    let event = new CustomEvent("save-picked", {
+      detail: {},
+    });
     this.dispatchEvent(event);
   }
 
   present() {
-    let event = new CustomEvent('present-picked', {
-      detail:{}
+    let event = new CustomEvent("present-picked", {
+      detail: {},
     });
     this.dispatchEvent(event);
   }
-  
+
   async shareToDevice() {
     const devices = await getDevices();
     console.log(devices);
@@ -289,38 +317,73 @@ export class AppToolbar extends LitElement {
   render() {
     return html`
       <div id="innerBlock">
-        <button id="redButton" aria-label="red color" @click="${() => this.pickColor('red')}"></button>
-        <button id="blueButton" aria-label="blue color" @click="${() => this.pickColor('blue')}"></button>
-        <button id="yellowButton" aria-label="yellow color" @click="${() => this.pickColor('yellow')}"></button>
-        <button id="greenButton" aria-label="green color" @click="${() => this.pickColor('green')}"></button>
-        <button id="blackButton" aria-label="black color" @click="${() => this.pickColor('black')}"></button>
+        <sl-color-picker value="${window.matchMedia("(prefers-color-scheme: dark)").matches ? "white" : "black"}" @sl-change="${() => this.handleColor()}"></sl-color-picker>
+        <button
+          id="redButton"
+          aria-label="red color"
+          @click="${() => this.pickColor("red")}"
+        ></button>
+        <button
+          id="blueButton"
+          aria-label="blue color"
+          @click="${() => this.pickColor("blue")}"
+        ></button>
+        <button
+          id="yellowButton"
+          aria-label="yellow color"
+          @click="${() => this.pickColor("yellow")}"
+        ></button>
+        <button
+          id="greenButton"
+          aria-label="green color"
+          @click="${() => this.pickColor("green")}"
+        ></button>
+        <button
+          id="blackButton"
+          aria-label="black color"
+          @click="${() => this.pickColor("black")}"
+        ></button>
 
-        <button id="clearButton" @click="${() => this.clearPrompt()}"><img src="/assets/trash.svg" alt="trash icon"></button>
-        <button id="saveButton" @click="${() => this.save()}"><img src="/assets/save-outline.svg" alt="save icon"></button>
-        <!--<button id="presentButton" @click="${() => this.present()}"><img src="/assets/tv-outline.svg" alt="present icon"></button>-->
-        <!--<button id="devicesButton" @click="${() => this.shareToDevice()}">Device</button>-->
+        <button id="clearButton" @click="${() => this.clearPrompt()}">
+          <sl-icon name="trash"></sl-icon>
+        </button>
+        <button id="saveButton" @click="${() => this.save()}">
+          <sl-icon name="download"></sl-icon>
+        </button>
+        <!--<button id="presentButton" @click="${() =>
+          this.present()}"><img src="/assets/tv-outline.svg" alt="present icon"></button>-->
+        <!--<button id="devicesButton" @click="${() =>
+          this.shareToDevice()}">Device</button>-->
 
-        ${this.showModeToast ? html`<div id="modeToast">${this.activeMode} mode</div>` : null}
+        <sl-alert id="modeToast" duration="3000" closable>
+          <strong>${this.activeMode} mode</strong>
+        </sl-alert>
+        <sl-dialog
+          id="clearCanvasDialog"
+          label="Clear Canvas?"
+          class="dialog-overview"
+        >
+          Are you sure you would like to clear the canvas? This action cannot
+          be undone.
 
-        ${this.confirmDelete === true ? html`
-        <div id="endPromptContainer">
-              <div id="endPrompt">
-                <h2>Clear Canvas?</h2>
+          <sl-button slot="footer" @click="${() => this.cancel()}"
+            >Cancel</sl-button
+          >
+          <sl-button slot="footer" variant="danger" @click="${() => this.clear()}"
+            >Clear</sl-button
+          >
+        </sl-dialog>
 
-                <div id="endPromptActions">
-                  <fluent-button @click="${() => this.clearPrompt()}">No</fluent-button>
-                  <fluent-button
-                    id="end-button"
-                    appearance="accent"
-                    @click="${() => this.clear()}"
-                    >Clear</fluent-button
-                  >
-                </div>
-              </div>
-            </div>
-        ` : null}
-
-        ${this.activeMode === 'pen' ? html`<button id="eraserButton" @click="${() => this.penMode('erase')}"><img src="/assets/erase.svg" alt="erase icon"></button>` : html`<button id="penButton" @click="${() => this.penMode('pen')}"><img src="/assets/brush.svg" alt="brush icon"></button>`}
+        ${this.activeMode === "pen"
+          ? html`<button
+              id="eraserButton"
+              @click="${() => this.penMode("erase")}"
+            >
+              <sl-icon name="eraser"></sl-icon>
+            </button>`
+          : html`<button id="penButton" @click="${() => this.penMode("pen")}">
+              <sl-icon name="pen"></sl-icon>
+            </button>`}
       </div>
     `;
   }

@@ -15,14 +15,15 @@ import "../components/session-item";
 export class AppIntro extends LitElement {
   @internalProperty() savedSessions: Array<any> | undefined = [];
 
+  @internalProperty() sessionName: string | undefined;
+
+  newRoom: string | undefined = undefined;
+
   static get styles() {
     return css`
       :host {
-        display: block;
-        background-color: white;
+        display: block;;
         padding-top: 2em;
-
-        color: black;
 
         padding: 16px;
 
@@ -33,7 +34,6 @@ export class AppIntro extends LitElement {
         display: flex;
         justify-content: space-between;
         align-items: center;
-        margin-top: 2em;
       }
 
       h2 {
@@ -45,7 +45,7 @@ export class AppIntro extends LitElement {
       }
 
       #new-button {
-       /* position: absolute;
+        /* position: absolute;
         right: 16px;
         bottom: 16px;
         border-radius: 22px;
@@ -87,16 +87,26 @@ export class AppIntro extends LitElement {
         margin-top: 2em;
       }
 
-      @media (min-width: 800px) {
+      @media (min-width: 1030px) {
         #saved-list {
           display: grid;
-          grid-template-columns: 32.33% 32.33% 32.33%;
+          grid-template-columns: auto auto auto;
           gap: 1%;
+          max-width: 80vw;
         }
       }
 
+      @media (min-width: 800px) and (max-width: 1030px) {
+        #saved-list {
+          display: grid;
+          grid-template-columns: auto auto;
+          gap: 1%;
+        }
+      }
+    
+
       @media (max-width: 800px) {
-        fluent-card {
+        sl-card {
           width: 100%;
         }
 
@@ -106,19 +116,49 @@ export class AppIntro extends LitElement {
 
         #screens img {
           width: 80vw;
+          margin-top: 2em;
+        }
+
+        #welcomeBlock {
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+          z-index: 1;
+          display: flex;
+          /* align-items: unset; */
+        }
+
+        #new-button {
+          border-radius: 0;
+          width: 100%;
+          --sl-input-border-radius-medium: 0;
+        }
+
+        #welcomeBlock h2 {
+          display: none;
+        }
+
+        #glass {
+          padding-bottom: 3em;
+        }
+
+        #recent-header {
           margin-top: 0;
         }
       }
 
-      @media (screen-spanning: single-fold-vertical) {
+      @media (horizontal-viewport-segments: 2) {
         #saved-list {
           display: grid;
-          grid-template-columns: 50% 50%;
-          gap: 30px;
+          max-width: 100%;
+          grid-template-columns: auto auto;
+          grid-column-gap: calc(env(viewport-segment-left 1 0) - env(viewport-segment-right 0 0) + 10px);
+          grid-row-gap: 10px;
         }
 
-        fluent-card {
-          width: 94.4%;
+        sl-card {
+          width: 100%;
         }
 
         #intro-container {
@@ -134,17 +174,15 @@ export class AppIntro extends LitElement {
       }
 
       #glass {
-        position: fixed;
-        top: 0;
-        bottom: 0;
-        left: 0;
-        right: 0;
-        backdrop-filter: blur(32px);
-        background: rgb(255 255 255 / 70%);
+        
+      }
 
-        padding: 16px;
-
-        overflow-y: auto;
+      @media(horizontal-viewport-segments: 2) {
+        sl-dialog::part(panel) {
+          right: 21px;
+          left: initial;
+          position: fixed;
+        }
       }
 
       @media (screen-spanning: single-fold-horizontal) {
@@ -164,12 +202,6 @@ export class AppIntro extends LitElement {
 
   constructor() {
     super();
-
-    if ((CSS as any).paintWorklet) {
-      (CSS as any).paintWorklet.addModule(
-        "https://unpkg.com/css-houdini-circles@1.0.5/dist/circles.js"
-      );
-    }
   }
 
   async firstUpdated() {
@@ -178,24 +210,42 @@ export class AppIntro extends LitElement {
     if (sessionsData) {
       this.savedSessions = sessionsData;
       console.log("savedSessions", sessionsData);
-    }
-    else {
+    } else {
       this.savedSessions = undefined;
     }
   }
 
   async newLive() {
     const room = randoRoom();
-    console.log(room);
+    this.newRoom = room;
 
+    const dialog = this.shadowRoot?.querySelector("#newSessionDialog");
+    (dialog as any).show();
+  }
+
+  async startNewSession() {
     if ((navigator as any).setAppBadge) {
       (navigator as any).setAppBadge();
     }
 
-    if (room) {
-      await saveSession(room);
-      Router.go(`/${room}`);
+    if (this.newRoom) {
+      await saveSession({
+        id: this.newRoom,
+        name: this.sessionName,
+      });
+      Router.go(`/${this.newRoom}`);
     }
+
+    if (this.newRoom) {
+      console.log("room", this.newRoom);
+      Router.go(`/${this.newRoom}`);
+    }
+  }
+
+  handleSessionName() {
+    const name = (this.shadowRoot?.querySelector("#sessionNameInput") as any)?.value;
+    console.log(name);
+    this.sessionName = name;
   }
 
   async share(session: any) {
@@ -220,20 +270,33 @@ export class AppIntro extends LitElement {
 
   render() {
     return html`
+      <sl-dialog
+        id="newSessionDialog"
+        label="New Session"
+        class="dialog-overview"
+      >
+        Name your session:
+
+        <sl-input id="sessionNameInput" @sl-change="${() => this.handleSessionName()}" placeholder="Planning"></sl-input>
+
+        <sl-button slot="footer">Close</sl-button>
+        <sl-button slot="footer" variant="primary" @click="${() => this.startNewSession()}">Start</sl-button>
+      </sl-dialog>
+
       <div id="glass">
         <div>
           ${this.savedSessions
             ? html`<div id="welcomeBlock">
-              <h2>Welcome!</h2>
+                <h2>Welcome!</h2>
 
-              <fluent-button
-                appearance="accent"
-                id="new-button"
-                @click="${() => this.newLive()}"
-              >
-                New Session
-              </fluent-button>
-            </div>`
+                <sl-button
+                  variant="primary"
+                  id="new-button"
+                  @click="${() => this.newLive()}"
+                >
+                  New Session
+                </sl-button>
+              </div>`
             : html`
                 <div id="intro-container">
                   <div id="intro-block">
@@ -245,13 +308,13 @@ export class AppIntro extends LitElement {
                       to go! Tap "New Session" to get started!
                     </p>
 
-                    <fluent-button
-                      appearance="accent"
+                    <sl-button
+                      variant="primary"
                       id="new-button"
                       @click="${() => this.newLive()}"
                     >
                       New Session
-                    </fluent-button>
+                    </sl-button>
                   </div>
 
                   <div id="screens">

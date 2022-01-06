@@ -1,4 +1,11 @@
-import { LitElement, css, html, customElement, property, internalProperty } from "lit-element";
+import {
+  LitElement,
+  css,
+  html,
+  customElement,
+  property,
+  internalProperty,
+} from "lit-element";
 
 @customElement("session-item")
 export class SessionItem extends LitElement {
@@ -14,12 +21,7 @@ export class SessionItem extends LitElement {
         margin-bottom: 14px;
       }
 
-      fluent-card {
-        --background-color: white;
-        padding-left: 12px;
-        padding-right: 12px;
-        padding-bottom: 12px;
-
+      sl-card {
         display: flex;
         flex-direction: column;
         justify-content: space-between;
@@ -35,12 +37,15 @@ export class SessionItem extends LitElement {
 
       #session-info h3 {
         margin-right: 10px;
+        margin-top: 0px;
       }
 
       #session-info p {
         overflow: hidden;
         white-space: nowrap;
         text-overflow: ellipsis;
+
+        margin-top: 0px;
       }
 
       #card-actions {
@@ -48,23 +53,34 @@ export class SessionItem extends LitElement {
         justify-content: space-between;
       }
 
-      #card-actions fast-anchor {
-        background-color: var(--app-color-primary);
-
-        padding-left: 6px;
-        padding-right: 6px;
-      }
-
-      #share-button, #delete-button, #qr-button {
-        margin-right: 2px;
-
-        padding-left: 6px;
-        padding-right: 6px;
-      }
-
-      #delete-button {
-        background: red;
-        color: white;
+      #card-actions a {
+        font-size: var(--sl-button-font-size-medium);
+        height: var(--sl-input-height-medium);
+        line-height: calc(
+          var(--sl-input-height-medium) - var(--sl-input-border-width) * 2
+        );
+        border-radius: var(--sl-input-border-radius-medium);
+        background-color: var(--sl-color-primary-600);
+        color: var(--sl-color-neutral-0);
+        display: inline-flex;
+        align-items: stretch;
+        justify-content: center;
+        /* width: 100%; */
+        border-style: solid;
+        border-width: var(--sl-input-border-width);
+        font-family: var(--sl-input-font-family);
+        font-weight: var(--sl-font-weight-semibold);
+        text-decoration: none;
+        user-select: none;
+        white-space: nowrap;
+        vertical-align: middle;
+        padding: 0px;
+        padding-left: 10px;
+        padding-right: 10px;
+        transition: var(--sl-transition-fast) background-color,
+          var(--sl-transition-fast) color, var(--sl-transition-fast) border,
+          var(--sl-transition-fast) box-shadow;
+        cursor: pointer;
       }
 
       #code {
@@ -78,12 +94,7 @@ export class SessionItem extends LitElement {
         height: 128px;
       }
 
-      @media (max-width: 800px) {
-        fluent-card {
-          width: 100%;
-          margin-bottom: 10px;
-        }
-
+      @media (max-width: 1030px) {
         :host {
           width: 100%;
         }
@@ -91,19 +102,25 @@ export class SessionItem extends LitElement {
         #new-button {
           width: 100%;
         }
+
+        sl-card {
+          margin-bottom: 10px;
+        }
       }
 
-      @media(max-width: 420px) {
-        #share-button, #delete-button, #qr-button {
+      @media (max-width: 545px) {
+        #share-button,
+        #delete-button,
+        #qr-button {
           padding-left: initial;
           padding-right: initial;
           margin-right: initial;
         }
       }
 
-      @media (screen-spanning: single-fold-vertical) {
-        fluent-card {
-          width: 94.4%;
+      @media (horizontal-viewport-segments: 2) {
+        sl-card {
+          width: 100%;
         }
 
         :host {
@@ -119,7 +136,7 @@ export class SessionItem extends LitElement {
   }
 
   firstUpdated() {
-
+    console.log(this.session);
   }
 
   async generateCode() {
@@ -139,7 +156,7 @@ export class SessionItem extends LitElement {
   async share(session: any) {
     if ((navigator as any).share) {
       await (navigator as any).share({
-        url: session.session,
+        url: session.id,
         text: "Join me on my board",
         title: "Live Canvas",
       });
@@ -153,10 +170,10 @@ export class SessionItem extends LitElement {
     const filtered = await module.deleteSession(session);
 
     if (filtered) {
-      let event = new CustomEvent('deleted', {
+      let event = new CustomEvent("deleted", {
         detail: {
-          sessions: filtered
-        }
+          sessions: filtered,
+        },
       });
       this.dispatchEvent(event);
     }
@@ -164,36 +181,37 @@ export class SessionItem extends LitElement {
 
   render() {
     return html`
-      <fluent-card>
-        <div id="session-info">
-          <h3>${this.session.date}</h3>
-          <p>ID: ${this.session.session}</p>
-        </div>
-
+      <sl-card>
+        ${this.session.name}
         ${this.codeGenerated ? html`<div id="code"></div>` : null}
 
-        <div id="card-actions">
-          <fluent-button @click="${() => this.delete(this.session.session)}" id="delete-button">
+        <div id="card-actions" slot="footer">
+          <sl-button
+            variant="danger"
+            @click="${() => this.delete(this.session.id)}"
+            id="delete-button"
+          >
             Delete
-          </fluent-button>
+          </sl-button>
 
           <div>
-            <fluent-button
+            <sl-button
               id="share-button"
               @click="${() => this.share(this.session)}"
-              >Share</fluent-button
+              variant="success"
+              >Share</sl-button
             >
 
-            <!--<fast-button ?disabled="${this.codeGenerated}" id="qr-button" @click="${() => this.generateCode()}">
+            <!--<fast-button ?disabled="${this
+              .codeGenerated}" id="qr-button" @click="${() =>
+              this.generateCode()}">
               QR Code
             </fast-button>-->
 
-            <fluent-anchor appearance="accent" href="${`/${this.session.session}`}"
-              >Resume</fluent-anchor
-            >
+            <a href="${`/${this.session.id}`}">Resume</a>
           </div>
         </div>
-      </fluent-card>
+      </sl-card>
     `;
   }
 }

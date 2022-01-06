@@ -40,11 +40,11 @@ export class ConnManager extends LitElement {
       }
 
       #successToast {
-        background: var(--app-color-primary);
+        background: green;
       }
 
       #tryingToast {
-        background: var(--app-color-secondary);
+        background: green;
       }
 
       @keyframes fadein {
@@ -63,7 +63,7 @@ export class ConnManager extends LitElement {
   }
 
   firstUpdated() {
-    console.log(this.socket);
+    console.log('this.socket', this.socket);
     if (this.socket) {
       this.socket.on("disconnect", (reason: string) => {
         console.log("reason", reason);

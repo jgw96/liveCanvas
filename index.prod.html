@@ -8,7 +8,10 @@
       name="viewport"
       content="viewport-fit=cover, width=device-width, initial-scale=1.0, minimum-scale=1.0, maximum-scale=5.0"
     />
-    <meta name="description" content="LiveCanvas is an open source collaborative drawing app offering a simple and fast user experience. LiveCanvas can be used with anyone, simply share a link and you are ready to go!" />
+    <meta
+      name="description"
+      content="LiveCanvas is an open source collaborative drawing app offering a simple and fast user experience. LiveCanvas can be used with anyone, simply share a link and you are ready to go!"
+    />
     <meta name="theme-color" content="#686bd2" />
 
     <meta name="apple-mobile-web-app-capable" content="yes" />
@@ -23,17 +26,29 @@
 
     <link href="global.css" rel="stylesheet" />
 
-    <link rel="prefetch" as="script" href="fast-components.js">
-    <link rel="prefetch" as="script" href="script/app-index.js">
+    <link
+      rel="stylesheet"
+      media="(prefers-color-scheme:light)"
+      href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/themes/light.css"
+    />
+    <link
+      rel="stylesheet"
+      media="(prefers-color-scheme:dark)"
+      href="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/themes/dark.css"
+      onload="document.documentElement.classList.add('sl-theme-dark');"
+    />
+    <script
+      type="module"
+      src="https://cdn.jsdelivr.net/npm/@shoelace-style/shoelace@2.0.0-beta.63/dist/shoelace.js"
+    ></script>
+
+    <link rel="prefetch" as="script" href="script/app-index.js" />
 
     <script type="module" src="script/app-index.js"></script>
   </head>
 
   <body>
-    <!-- Our app-index web component. This component is defined in src/pages/app-index.ts-->
-    <fluent-design-system-provider use-defaults>
-      <app-index></app-index>
-    </fluent-design-system-provider>
+    <app-index></app-index>
 
     <!-- For more info on the pwa-update component click here https://github.com/pwa-builder/pwa-update -->
     <script
@@ -46,8 +61,5 @@
       async
       defer
     ></script>
-
-    <!-- Microsoft Fast Components https://www.fast.design/docs/components/getting-started-->
-    <script type="module" src="fast-components.js"></script>
   </body>
 </html>

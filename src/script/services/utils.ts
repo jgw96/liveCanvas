@@ -13,7 +13,7 @@ export const requestWakeLock = async () => {
     });
     console.log('Screen Wake Lock released:', wakeLock.released);
   } catch (err) {
-    console.error(`${err.name}, ${err.message}`);
+    console.error(`${(err as any).name}, ${(err as any).message}`);
   }
 };
 

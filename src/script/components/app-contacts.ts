@@ -80,17 +80,17 @@ export class AppContacts extends LitElement {
           background: #ffffff;
         }
       }
-      #contactsList fluent-menu-item {
+      #contactsList sl-menu-item {
         margin-top: 10px;
         background: transparent;
       }
-      #contactsList fluent-menu-item::part(content) {
+      #contactsList sl-menu-item::part(content) {
         width: 100%;
         display: flex;
         align-items: center;
         justify-content: space-between;
       }
-      #contactsList ul fluent-button {
+      #contactsList ul sl-button {
         height: 2em;
         border: solid 1px var(--app-color-primary);
         margin-bottom: 6px;
@@ -100,20 +100,6 @@ export class AppContacts extends LitElement {
         position: fixed;
         bottom: 16px;
         right: 16px;
-        color: white;
-        border: none;
-        font-size: 16px;
-        border-radius: 50%;
-        width: 48px;
-        height: 48px;
-      }
-
-      #contactsButton img {
-        color: white;
-      }
-
-      #contactsButton img, #contactsHeader img {
-        width: 18px;
       }
 
       @media (prefers-color-scheme: light) {
@@ -145,9 +131,12 @@ export class AppContacts extends LitElement {
         }
       }
 
-      @media(max-width: 420px) {
+      @media(max-width: 545px) {
         #contactsButton {
-          bottom: 4.4em;
+          top: 6px;
+          bottom: initial;
+          left: 6px;
+          right: initial;
         }
       }
     `;
@@ -219,33 +208,33 @@ export class AppContacts extends LitElement {
 
   render() {
     return html`
-      <fluent-button id="contactsButton" appearance="accent" @click="${() => this.selectContacts()}">
-        <img src="/assets/share.svg" alt="share icon">
-      </fluent-button>
+      <sl-button id="contactsButton" @click="${() => this.selectContacts()}">
+        Share
+      </sl-button>
       ${this.graphContacts
         ? html`<div id="contactsBlock">
             <div id="contactsList">
               <div id="contactsHeader">
                 <h3>Frequent Contacts</h3>
-                <fluent-button id="closeButton" appearance="lightweight" @click="${() => this.close()}">
+                <sl-button id="closeButton" appearance="lightweight" @click="${() => this.close()}">
                   <img src="/assets/close.svg" alt="close icon">
-                </fluent-button>
+                </sl-button>
               </div>
               <ul>
                 ${this.graphContacts.map((contact) => {
                   return html`
-                    <fluent-menu-item>
+                    <sl-menu-item>
                       <div class="contactInfo">
                         <span class="displayName">${contact.displayName}</span>
                         <span class="displayEmail"
                           >Address: ${contact.emailAddresses[0].address}</span
                         >
                       </div>
-                      <fluent-button
+                      <sl-button
                         @click="${() => this.handleResults([contact])}"
-                        >Select</fluent-button
+                        >Select</sl-button
                       >
-                    </fluent-menu-item>
+                    </sl-menu-item>
                   `;
                 })}
               </ul>

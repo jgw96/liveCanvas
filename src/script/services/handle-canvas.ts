@@ -30,7 +30,9 @@ export const setupCanvas = async (canvas: HTMLCanvasElement): Promise<CanvasRend
       ctx.lineWidth = 5;
       ctx.lineCap = "round";
 
-      ctx.fillStyle = "white";
+      // white if light theme, black if dark theme
+      ctx.fillStyle = window.matchMedia("(prefers-color-scheme: dark)").matches ? "#282828" : "white";
+
       ctx.fillRect(0, 0, canvas.width, canvas.height);
     }
 
@@ -113,7 +115,7 @@ export const handleEvents = async (
                 // eraser
                 ctx.lineWidth = 18;
 
-                ctx.globalCompositeOperation = "destination-out";
+                ctx.strokeStyle = ctx.fillStyle;
                 ctx.beginPath();
                 ctx.moveTo(previous.clientX, previous.clientY);
                 for (const point of pointer.getCoalesced()) {
@@ -189,7 +191,7 @@ export const handleEvents = async (
       } else if (pickedMode === "erase") {
         console.log('erasing');
         if (ctx) {
-          ctx.globalCompositeOperation = "destination-out";
+          ctx.strokeStyle = ctx.fillStyle;
 
           ctx.lineWidth = 18;
 

@@ -1,4 +1,11 @@
-import { LitElement, css, html, customElement, property, internalProperty } from "lit-element";
+import {
+  LitElement,
+  css,
+  html,
+  customElement,
+  property,
+  internalProperty,
+} from "lit-element";
 
 // For more info on the @pwabuilder/pwainstall component click here https://github.com/pwa-builder/pwa-install
 import "@pwabuilder/pwainstall";
@@ -32,12 +39,13 @@ export class AppHome extends LitElement {
   @property({ type: Boolean }) endPrompt: boolean = false;
 
   @internalProperty() handle: any | undefined;
-
   @internalProperty() showCopyToast: boolean = false;
+  @internalProperty() socket: any = null;
 
   room: any = null;
-  socket: any = null;
   contacts: any[] = [];
+
+  newRoom: string | undefined = undefined;
 
   static get styles() {
     return css`
@@ -73,26 +81,6 @@ export class AppHome extends LitElement {
         }
       }
 
-      #copyToast {
-        z-index: 9999;
-        position: absolute;
-        bottom: 14px;
-        right: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: var(--app-color-primary);
-        color: white;
-        font-weight: bold;
-        padding: 20px;
-
-        box-shadow: rgb(104 107 210 / 38%) 0px 0px 10px 4px;
-        border-radius: 6px;
-
-        animation-name: fadein;
-        animation-duration: 400ms;
-      }
-
       #newLive {
         position: fixed;
         bottom: 16px;
@@ -113,16 +101,8 @@ export class AppHome extends LitElement {
         align-items: center;
       }
 
-      #newLive img,
-      #endButton img {
-        width: 18px;
-        margin-right: 8px;
-      }
-
       #endButton,
       #shareRoom {
-        cursor: pointer;
-
         animation-name: fadein;
         animation-duration: 200ms;
       }
@@ -138,20 +118,6 @@ export class AppHome extends LitElement {
         position: fixed;
         bottom: 16px;
         right: 16px;
-
-        background: var(--app-color-secondary);
-        color: white;
-        border: none;
-        font-size: 16px;
-
-        border-radius: 50%;
-        width: 48px;
-        height: 48px;
-      }
-
-      #shareRoom img {
-        width: 22px;
-        height: 22px;
       }
 
       #contactsAlert {
@@ -203,51 +169,14 @@ export class AppHome extends LitElement {
         pointer-events: none;
       }
 
-      #sessionToast {
-        z-index: 9999;
-        position: absolute;
-        bottom: 14px;
-        right: 14px;
-        display: flex;
-        align-items: center;
-        justify-content: space-between;
-        background: white;
-        color: black;
-        box-shadow: rgb(104 107 210 / 38%) 0px 0px 10px 4px;
-        border-radius: 6px;
-        padding-top: 6px;
-        padding-bottom: 6px;
-        padding-left: 12px;
-        padding-right: 12px;
-
-        animation-name: fadein;
-        animation-duration: 400ms;
-      }
-
-      fluent-button {
+      sl-button {
         border-radius: 22px;
-      }
-
-      #sessionToast fluent-button {
-        margin-left: 14px;
-      }
-
-      #sessionToast fluent-button::part(control) {
-        font-weight: bold;
       }
 
       #endButton {
         position: fixed;
         bottom: 16px;
         right: 6em;
-        width: 48px;
-        height: 48px;
-        border-width: initial;
-        border-style: none;
-        border-color: initial;
-        border-image: initial;
-        border-radius: 50%;
-        background: #f84848;
       }
 
       #endPromptContainer {
@@ -264,7 +193,7 @@ export class AppHome extends LitElement {
         animation-duration: 300ms;
       }
 
-      @media (screen-spanning: single-fold-vertical) {
+      @media (horizontal-viewport-segments: 2) {
         #endPromptContainer {
           width: 50vw;
           right: 0;
@@ -272,7 +201,7 @@ export class AppHome extends LitElement {
         }
       }
 
-      @media(screen-spanning: single-fold-horizontal) {
+      @media (screen-spanning: single-fold-horizontal) {
         #endPromptContainer {
           height: 50vh;
           right: 0;
@@ -311,7 +240,7 @@ export class AppHome extends LitElement {
         padding-right: 0;
       }
 
-      #endPromptActions fluent-button {
+      #endPromptActions sl-button {
         width: 5em;
       }
 
@@ -348,7 +277,7 @@ export class AppHome extends LitElement {
         width: 4em;
       }
 
-      @media (max-width: 420px) {
+      @media (max-width: 545px) {
         #newLive {
           right: 6px;
           bottom: 15px;
@@ -360,8 +289,9 @@ export class AppHome extends LitElement {
         }
 
         #endButton {
-          bottom: 9.4em;
-          right: 16px;
+          top: 6px;
+          right: 6px;
+          bottom: initial;
         }
 
         pwa-install {
@@ -381,6 +311,14 @@ export class AppHome extends LitElement {
 
         #newLive img {
           margin: 0;
+        }
+      }
+
+      @media(horizontal-viewport-segments: 2) {
+        sl-dialog::part(panel) {
+          right: 21px;
+          left: initial;
+          position: fixed;
         }
       }
 
@@ -411,17 +349,14 @@ export class AppHome extends LitElement {
 
       this.setupLiveEvents();
 
-      if ('wakeLock' in navigator) {
+      if ("wakeLock" in navigator) {
         // Screen Wake Lock API supported 🎉
 
         await requestWakeLock();
       }
 
-      this.showToast = true;
-
-      setTimeout(() => {
-        this.showToast = false;
-      }, 5000);
+      const sessionToast: any = this.shadowRoot?.querySelector("#sessionToast");
+      sessionToast.toast();
     } else {
       await this.setupEvents();
     }
@@ -442,12 +377,7 @@ export class AppHome extends LitElement {
 
     if (this.ctx) {
       this.ctx.fillStyle = "white";
-      this.ctx.fillRect(
-        0,
-        0,
-        canvas.width,
-        canvas.height
-      );
+      this.ctx.fillRect(0, 0, canvas.width, canvas.height);
 
       this.ctx.lineCap = "round";
       this.ctx.lineJoin = "round";
@@ -479,15 +409,20 @@ export class AppHome extends LitElement {
 
   async newLive() {
     const room = randoRoom();
-    console.log(room);
+    this.newRoom = room;
 
+    const dialog = this.shadowRoot?.querySelector("#newSessionDialog");
+    (dialog as any).show();
+  }
+
+  startNewSession() {
     if ((navigator as any).setAppBadge) {
       (navigator as any).setAppBadge();
     }
 
-    if (room) {
-      console.log('room', room);
-      Router.go(`/${room}`);
+    if (this.newRoom) {
+      console.log("room", this.newRoom);
+      Router.go(`/${this.newRoom}`);
     }
   }
 
@@ -496,10 +431,8 @@ export class AppHome extends LitElement {
       "canvas"
     ) as HTMLCanvasElement;
 
-    const cursorCanvas:
-      | HTMLCanvasElement
-      | null
-      | undefined = this.shadowRoot?.querySelector("#secondCanvas");
+    const cursorCanvas: HTMLCanvasElement | null | undefined =
+      this.shadowRoot?.querySelector("#secondCanvas");
 
     await handleEvents(
       canvas,
@@ -511,15 +444,11 @@ export class AppHome extends LitElement {
   }
 
   async setupLiveEvents() {
-    const cursorCanvas:
-      | HTMLCanvasElement
-      | null
-      | undefined = this.shadowRoot?.querySelector("#secondCanvas");
+    const cursorCanvas: HTMLCanvasElement | null | undefined =
+      this.shadowRoot?.querySelector("#secondCanvas");
 
-    const thirdCanvas:
-      | HTMLCanvasElement
-      | null
-      | undefined = this.shadowRoot?.querySelector("#thirdCanvas");
+    const thirdCanvas: HTMLCanvasElement | null | undefined =
+      this.shadowRoot?.querySelector("#thirdCanvas");
 
     const thirdContext = thirdCanvas?.getContext("2d");
 
@@ -549,25 +478,17 @@ export class AppHome extends LitElement {
 
       this.contacts = contacts;
       this.sendInvite();
-    }
-    else if ((navigator as any).share) {
+    } else if ((navigator as any).share) {
       await (navigator as any).share({
         url: location.href,
         text: "Join me on my board",
         title: "Live Canvas",
       });
-    }
-    else if(navigator.clipboard) {
+    } else if (navigator.clipboard) {
       await navigator.clipboard.writeText(`${location.href}`);
-      
-      // hide invite toast if still up
-      this.showToast = false;
 
-      this.showCopyToast = true;
-
-      setTimeout(() => {
-        this.showCopyToast = false
-      }, 3000);
+      const copyToast: any = this.shadowRoot?.querySelector("#copyToast");
+      copyToast.toast();
     }
   }
 
@@ -581,11 +502,10 @@ export class AppHome extends LitElement {
   sendInvite() {
     let email = "";
     this.contacts.forEach((contact) => {
-      console.log('contact', contact);
+      console.log("contact", contact);
       if (email.length > 0) {
         email = email + "," + contact;
-      }
-      else {
+      } else {
         email = contact;
       }
     });
@@ -602,7 +522,8 @@ export class AppHome extends LitElement {
 
     if (this.ctx && canvas) {
       this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
-      this.ctx.fillStyle = "white";
+
+      this.ctx.fillStyle = window.matchMedia("(prefers-color-scheme: dark)").matches ? "#282828" : "white";
       this.ctx?.fillRect(0, 0, canvas.width, canvas.height);
     }
   }
@@ -610,7 +531,7 @@ export class AppHome extends LitElement {
   async handleSave() {
     const canvas = this.shadowRoot?.querySelector("canvas");
 
-    const fileModule = await import('browser-fs-access');
+    const fileModule = await import("browser-fs-access");
 
     const options = {
       fileName: "Untitled.png",
@@ -623,34 +544,35 @@ export class AppHome extends LitElement {
           if (blob) {
             this.handle = await fileModule.fileSave(blob, options, this.handle);
           }
-        })
-      }
-      else {
+        });
+      } else {
         canvas.toBlob(async (blob) => {
           if (blob) {
             this.handle = await fileModule.fileSave(blob, options);
           }
-        })
+        });
       }
     }
   }
 
   endSession() {
-    this.endPrompt = true;
+    const endSesionDialog = this.shadowRoot?.querySelector("#endSessionDialog");
+    (endSesionDialog as any).show();
+  }
+
+  cancel() {
+    const endSesionDialog = this.shadowRoot?.querySelector("#endSessionDialog");
+    (endSesionDialog as any).hide();
   }
 
   async end() {
     Router.go("/");
-    
+
     if ((navigator as any).clearAppBadge) {
       (navigator as any).clearAppBadge();
     }
 
     await releaseWakeLock();
-  }
-
-  no() {
-    this.endPrompt = false;
   }
 
   async handlePresent() {
@@ -662,6 +584,17 @@ export class AppHome extends LitElement {
 
   render() {
     return html`
+      <sl-dialog
+        id="endSessionDialog"
+        label="End Session"
+        class="dialog-overview"
+      >
+        End your session? You will be able to restart this session from the home page.
+
+        <sl-button slot="footer" @click="${() => this.cancel()}">Cancel</sl-button>
+        <sl-button slot="footer" variant="danger" @click="${() => this.end()}">End</sl-button>
+      </sl-dialog>
+
       <div>
         <pwa-install>Install Live Canvas</pwa-install>
 
@@ -679,62 +612,35 @@ export class AppHome extends LitElement {
         ></app-toolbar>
       </div>
 
-      ${
-        this.showCopyToast ? html`<div id="copyToast">URL copied to clipboard for sharing</div>` : null
-      }
-      
+      <sl-alert id="copyToast" duration="3000" closable>
+        <strong>URL copied to clipboard for sharing</strong>
+      </sl-alert>
 
-      ${this.showToast
-        ? html`
-            <div id="sessionToast">
-              You have started a new session
+      <sl-alert id="sessionToast" duration="8000" closable>
+        <strong>You have started a new session</strong>
+      </sl-alert>
 
-              <fluent-button appearance="lightweight" @click="${this.share}"
-                >Invite</fluent-button
-              >
-            </div>
-          `
-        : null}
       ${this.socket && this.socket !== null
         ? html`<conn-manager .socket="${this.socket}"></conn-manager>`
         : null}
-      ${this.endPrompt
-        ? html`
-            <div id="endPromptContainer">
-              <div id="endPrompt">
-                <h2>End Session?</h2>
 
-                <div id="endPromptActions">
-                  <fluent-button @click="${this.no}">No</fluent-button>
-                  <fluent-button
-                    id="end-button"
-                    appearance="accent"
-                    @click="${this.end}"
-                    >End</fluent-button
-                  >
-                </div>
-              </div>
-            </div>
-          `
-        : null}
       ${location.pathname.length > 1
-        ? html`<button id="endButton" @click="${this.endSession}">
-            <img src="/assets/close.svg" alt="close session" />
+        ? html`<sl-button id="endButton" variant="danger" @click="${this.endSession}">
+            End Session
           </button>`
         : null}
-        
       ${location.pathname.length === 1
-        ? html`<fluent-button
-            appearance="accent"
+        ? html`<sl-button
+            variant="accent"
             id="newLive"
             @click="${this.newLive}"
           >
-            <img src="/assets/add.svg" alt="add icon" />
-            <span>New Session</span></fluent-button
+            New Session</sl-button
           >`
-        : html`<app-contacts id="shareRoom"
-        @got-contacts="${(ev: CustomEvent) => this.handleContacts(ev)}"
-      ></app-contacts>`}
+        : html`<app-contacts
+            id="shareRoom"
+            @got-contacts="${(ev: CustomEvent) => this.handleContacts(ev)}"
+          ></app-contacts>`}
     `;
   }
 }

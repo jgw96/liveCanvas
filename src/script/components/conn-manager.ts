@@ -2,18 +2,16 @@ import {
   LitElement,
   css,
   html,
-  customElement,
-  property,
-  internalProperty,
-} from "lit-element";
+} from "lit";
+import { customElement, property, state } from 'lit/decorators.js';
 
 @customElement("conn-manager")
 export class ConnManager extends LitElement {
   @property({ type: Object }) socket: any = null;
 
-  @internalProperty() errorMessage: string | undefined;
-  @internalProperty() successMessage: string | undefined;
-  @internalProperty() tryingMessage: string | undefined;
+  @state() errorMessage: string | undefined;
+  @state() successMessage: string | undefined;
+  @state() tryingMessage: string | undefined;
 
   static get styles() {
     return css`

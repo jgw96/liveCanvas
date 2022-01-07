@@ -2,16 +2,14 @@ import {
   LitElement,
   css,
   html,
-  customElement,
-  property,
-  internalProperty,
-} from "lit-element";
+} from "lit";
+import { customElement, property, state } from 'lit/decorators.js';
 
 @customElement("app-header")
 export class AppHeader extends LitElement {
   @property({ type: Object }) userData: any = null;
 
-  @internalProperty() openSettings: boolean = false;
+  @state() openSettings: boolean = false;
 
   ani: Animation | undefined;
 

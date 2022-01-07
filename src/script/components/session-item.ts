@@ -1,17 +1,15 @@
 import {
   LitElement,
   css,
-  html,
-  customElement,
-  property,
-  internalProperty,
-} from "lit-element";
+  html
+} from "lit";
+import { customElement, property, state } from 'lit/decorators.js';
 
 @customElement("session-item")
 export class SessionItem extends LitElement {
   @property({ type: Object }) session: any = null;
 
-  @internalProperty() codeGenerated: boolean = false;
+  @state() codeGenerated: boolean = false;
 
   static get styles() {
     return css`
@@ -19,6 +17,11 @@ export class SessionItem extends LitElement {
         min-height: 8em;
 
         margin-bottom: 14px;
+      }
+
+      sl-card::part(body){
+        font-weight: bold;
+        font-size: 1.3em;
       }
 
       sl-card {

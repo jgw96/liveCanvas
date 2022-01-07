@@ -3,9 +3,8 @@ import {
   LitElement,
   css,
   html,
-  customElement,
-  internalProperty,
-} from "lit-element";
+} from "lit";
+import { customElement, state } from 'lit/decorators.js';
 import { getSavedSessions, saveSession } from "../services/sessions";
 import { randoRoom } from "../services/utils";
 
@@ -13,9 +12,9 @@ import "../components/session-item";
 
 @customElement("app-intro")
 export class AppIntro extends LitElement {
-  @internalProperty() savedSessions: Array<any> | undefined = [];
+  @state() savedSessions: Array<any> | undefined = [];
 
-  @internalProperty() sessionName: string | undefined;
+  @state() sessionName: string | undefined;
 
   newRoom: string | undefined = undefined;
 
@@ -28,6 +27,10 @@ export class AppIntro extends LitElement {
         padding: 16px;
 
         height: 96vh;
+      }
+
+      #sessionNameInput {
+        margin-top: 1em;
       }
 
       #welcomeBlock {
@@ -133,6 +136,10 @@ export class AppIntro extends LitElement {
           border-radius: 0;
           width: 100%;
           --sl-input-border-radius-medium: 0;
+        }
+        #new-button::part(base) {
+          height: 3.6em;
+          align-items: center;
         }
 
         #welcomeBlock h2 {
@@ -287,7 +294,7 @@ export class AppIntro extends LitElement {
         <div>
           ${this.savedSessions
             ? html`<div id="welcomeBlock">
-                <h2>Welcome!</h2>
+                <h2>Recent Sessions</h2>
 
                 <sl-button
                   variant="primary"
@@ -325,9 +332,7 @@ export class AppIntro extends LitElement {
                   </div>
                 </div>
               `}
-          ${this.savedSessions
-            ? html`<h3 id="recent-header">Recent Sessions</h3>`
-            : null}
+
           <div id="saved-list">
             ${this.savedSessions
               ? this.savedSessions.map((session) => {

@@ -2,10 +2,9 @@ import {
   LitElement,
   css,
   html,
-  customElement,
-  property,
-  internalProperty,
-} from "lit-element";
+} from "lit";
+
+import { customElement, property, state } from 'lit/decorators.js';
 
 // For more info on the @pwabuilder/pwainstall component click here https://github.com/pwa-builder/pwa-install
 import "@pwabuilder/pwainstall";
@@ -38,9 +37,9 @@ export class AppHome extends LitElement {
   @property({ type: Boolean }) showToast: boolean = false;
   @property({ type: Boolean }) endPrompt: boolean = false;
 
-  @internalProperty() handle: any | undefined;
-  @internalProperty() showCopyToast: boolean = false;
-  @internalProperty() socket: any = null;
+  @state() handle: any | undefined;
+  @state() showCopyToast: boolean = false;
+  @state() socket: any = null;
 
   room: any = null;
   contacts: any[] = [];

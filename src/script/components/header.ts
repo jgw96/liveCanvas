@@ -228,7 +228,7 @@ export class AppHeader extends LitElement {
   render() {
     return html`
       <header>
-        <h1>LiveCanvas</h1>
+        <h1>Webboard</h1>
 
         <div id="settingsBlock">
         <!--<fast-button @click="${() =>
@@ -266,14 +266,14 @@ export class AppHeader extends LitElement {
                 <fast-card class="settings-item">
                   <h3>About</h3>
                   <p>
-                    LiveCanvas is an open source collaborative drawing app
-                    offering a simple and fast user experience. LiveCanvas can
+                    Webboard is an open source collaborative drawing app
+                    offering a simple and fast user experience. Webboard can
                     be used with anyone, simply share a link and you are ready
                     to go!
                   </p>
 
                   <fast-anchor
-                    href="https://github.com/jgw96/liveCanvas"
+                    href="https://github.com/jgw96/Webboard"
                     apperance="button"
                     >Github</fast-anchor
                   >

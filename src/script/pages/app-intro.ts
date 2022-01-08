@@ -294,14 +294,14 @@ export class AppIntro extends LitElement {
         <div>
           ${this.savedSessions
             ? html`<div id="welcomeBlock">
-                <h2>Recent Sessions</h2>
+                <h2>Recent Boards</h2>
 
                 <sl-button
                   variant="primary"
                   id="new-button"
                   @click="${() => this.newLive()}"
                 >
-                  New Session
+                  New Board
                 </sl-button>
               </div>`
             : html`
@@ -309,10 +309,10 @@ export class AppIntro extends LitElement {
                   <div id="intro-block">
                     <h2>Welcome!</h2>
                     <p>
-                      LiveCanvas is an open source collaborative drawing app
-                      offering a simple and fast user experience. LiveCanvas can
+                      Webboard is an open source, collaborative whiteboarding app
+                      offering a simple and fast user experience. Webboard can
                       be used with anyone, simply share a link and you are ready
-                      to go! Tap "New Session" to get started!
+                      to go! Tap "New Board" to get started!
                     </p>
 
                     <sl-button
@@ -320,7 +320,7 @@ export class AppIntro extends LitElement {
                       id="new-button"
                       @click="${() => this.newLive()}"
                     >
-                      New Session
+                      New Board
                     </sl-button>
                   </div>
 

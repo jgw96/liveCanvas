@@ -15,12 +15,20 @@ export class AppHeader extends LitElement {
 
   static get styles() {
     return css`
+     :host {
+      position: fixed;
+      top: 0;
+      right: 0;
+      left: 0;
+      z-index: 999;
+     }
+
       header {
         display: flex;
         justify-content: space-between;
         align-items: center;
         padding-left: 16px;
-        padding-right: 16px;
+        padding-right: 6px;
         height: 3.6em;
         z-index: 99999;
       }
@@ -112,12 +120,9 @@ export class AppHeader extends LitElement {
 
       #loginButton,
       #logoutButton {
-        display: none;
         align-items: center;
         padding-left: 6px;
         padding-right: 6px;
-
-        color: black;
       }
 
       @media (max-width: 800px) {
@@ -228,7 +233,7 @@ export class AppHeader extends LitElement {
   render() {
     return html`
       <header>
-        <h1>Webboard</h1>
+        <h1>WebBoard</h1>
 
         <div id="settingsBlock">
         <!--<fast-button @click="${() =>
@@ -240,7 +245,7 @@ export class AppHeader extends LitElement {
                 id="loginButton"
                 appearance="outline"
                 @click="${() => this.login()}"
-                >Login</sl-button
+                >Login with Microsoft</sl-button
               >`
             : html`
                 <sl-button
@@ -248,7 +253,7 @@ export class AppHeader extends LitElement {
                   @click="${() => this.handleLogout()}"
                   id="avatar"
                 >
-                  <p>Logout</p>
+                  Logout
                 </sl-button>
               `
         }
@@ -266,14 +271,14 @@ export class AppHeader extends LitElement {
                 <fast-card class="settings-item">
                   <h3>About</h3>
                   <p>
-                    Webboard is an open source collaborative drawing app
-                    offering a simple and fast user experience. Webboard can
+                    WebBoard is an open source collaborative drawing app
+                    offering a simple and fast user experience. WebBoard can
                     be used with anyone, simply share a link and you are ready
                     to go!
                   </p>
 
                   <fast-anchor
-                    href="https://github.com/jgw96/Webboard"
+                    href="https://github.com/jgw96/WebBoard"
                     apperance="button"
                     >Github</fast-anchor
                   >

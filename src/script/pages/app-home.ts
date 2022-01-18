@@ -1,10 +1,6 @@
-import {
-  LitElement,
-  css,
-  html,
-} from "lit";
+import { LitElement, css, html } from "lit";
 
-import { customElement, property, state } from 'lit/decorators.js';
+import { customElement, property, state } from "lit/decorators.js";
 
 // For more info on the @pwabuilder/pwainstall component click here https://github.com/pwa-builder/pwa-install
 import "@pwabuilder/pwainstall";
@@ -17,13 +13,13 @@ import "../components/app-contacts";
 
 import { socket_connect } from "../services/handle-socket";
 import {
-  changeColor,
-  changeMode,
+  setupCanvas,
   handleEvents,
   handleLiveEvents,
-  resetCursorCanvas,
-  setupCanvas,
-} from "../services/handle-canvas";
+  changeMode,
+  changeColor,
+  clearDrawings,
+} from "../services/handle-canvas-new";
 import { get } from "idb-keyval";
 
 declare var io: any;
@@ -56,6 +52,7 @@ export class AppHome extends LitElement {
         position: absolute;
         top: 0;
         left: 0;
+        right: 0;
         width: 100%;
         height: 100%;
         touch-action: none;
@@ -288,9 +285,8 @@ export class AppHome extends LitElement {
         }
 
         #endButton {
-          top: 6px;
+          bottom: 6px;
           right: 6px;
-          bottom: initial;
         }
 
         pwa-install {
@@ -313,7 +309,7 @@ export class AppHome extends LitElement {
         }
       }
 
-      @media(horizontal-viewport-segments: 2) {
+      @media (horizontal-viewport-segments: 2) {
         sl-dialog::part(panel) {
           right: 21px;
           left: initial;
@@ -353,17 +349,9 @@ export class AppHome extends LitElement {
 
         await requestWakeLock();
       }
-
-      const sessionToast: any = this.shadowRoot?.querySelector("#sessionToast");
-      sessionToast.toast();
     } else {
       await this.setupEvents();
     }
-
-    window.addEventListener("resize", () => {
-      this.handleResize();
-      resetCursorCanvas(window.innerWidth, window.innerHeight);
-    });
   }
 
   async handleResize() {
@@ -398,6 +386,7 @@ export class AppHome extends LitElement {
   async setupCanvas() {
     const canvas = this.shadowRoot?.querySelector("canvas");
     if (canvas) {
+      // const possibleCtx = await setupCanvas(canvas);
       const possibleCtx = await setupCanvas(canvas);
 
       if (possibleCtx) {
@@ -426,20 +415,14 @@ export class AppHome extends LitElement {
   }
 
   async setupEvents() {
-    const canvas = this.shadowRoot?.querySelector(
+    /*const canvas = this.shadowRoot?.querySelector(
       "canvas"
     ) as HTMLCanvasElement;
 
     const cursorCanvas: HTMLCanvasElement | null | undefined =
-      this.shadowRoot?.querySelector("#secondCanvas");
+      this.shadowRoot?.querySelector("#secondCanvas");*/
 
-    await handleEvents(
-      canvas,
-      cursorCanvas ? cursorCanvas : null,
-      this.color,
-      this.ctx,
-      this.socket
-    );
+    await handleEvents(this.color, this.ctx, this.socket);
   }
 
   async setupLiveEvents() {
@@ -452,7 +435,7 @@ export class AppHome extends LitElement {
     const thirdContext = thirdCanvas?.getContext("2d");
 
     if (thirdCanvas && thirdContext && cursorCanvas) {
-      await handleLiveEvents(thirdCanvas, thirdContext, this.socket);
+      await handleLiveEvents(thirdCanvas, thirdContext, this.socket, cursorCanvas);
     }
   }
 
@@ -522,9 +505,14 @@ export class AppHome extends LitElement {
     if (this.ctx && canvas) {
       this.ctx.clearRect(0, 0, window.innerWidth, window.innerHeight);
 
-      this.ctx.fillStyle = window.matchMedia("(prefers-color-scheme: dark)").matches ? "#282828" : "white";
+      this.ctx.fillStyle = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "#181818"
+        : "white";
       this.ctx?.fillRect(0, 0, canvas.width, canvas.height);
     }
+
+    clearDrawings();
   }
 
   async handleSave() {
@@ -585,13 +573,17 @@ export class AppHome extends LitElement {
     return html`
       <sl-dialog
         id="endSessionDialog"
-        label="End Session"
+        label="End whiteboard session"
         class="dialog-overview"
       >
-        End your session? You will be able to restart this session from the home page.
+        Done with your whiteboard? You can get back to it from the home page.
 
-        <sl-button slot="footer" @click="${() => this.cancel()}">Cancel</sl-button>
-        <sl-button slot="footer" variant="danger" @click="${() => this.end()}">End</sl-button>
+        <sl-button slot="footer" @click="${() => this.cancel()}"
+          >Cancel</sl-button
+        >
+        <sl-button slot="footer" variant="danger" @click="${() => this.end()}"
+          >I'm Done</sl-button
+        >
       </sl-dialog>
 
       <div>
@@ -615,17 +607,12 @@ export class AppHome extends LitElement {
         <strong>URL copied to clipboard for sharing</strong>
       </sl-alert>
 
-      <sl-alert id="sessionToast" duration="8000" closable>
-        <strong>You have started a new session</strong>
-      </sl-alert>
-
       ${this.socket && this.socket !== null
         ? html`<conn-manager .socket="${this.socket}"></conn-manager>`
         : null}
-
       ${location.pathname.length > 1
         ? html`<sl-button id="endButton" variant="danger" @click="${this.endSession}">
-            End Session
+            I'm Done
           </button>`
         : null}
       ${location.pathname.length === 1
@@ -634,7 +621,7 @@ export class AppHome extends LitElement {
             id="newLive"
             @click="${this.newLive}"
           >
-            New Session</sl-button
+            New whiteboard</sl-button
           >`
         : html`<app-contacts
             id="shareRoom"

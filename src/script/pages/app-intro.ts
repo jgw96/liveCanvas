@@ -181,7 +181,7 @@ export class AppIntro extends LitElement {
       }
 
       #glass {
-        
+        margin-top: 2em;
       }
 
       @media(horizontal-viewport-segments: 2) {
@@ -309,8 +309,8 @@ export class AppIntro extends LitElement {
                   <div id="intro-block">
                     <h2>Welcome!</h2>
                     <p>
-                      Webboard is an open source, collaborative whiteboarding app
-                      offering a simple and fast user experience. Webboard can
+                      WebBoard is an open source, collaborative whiteboarding app
+                      offering a simple and fast user experience. WebBoard can
                       be used with anyone, simply share a link and you are ready
                       to go! Tap "New Board" to get started!
                     </p>

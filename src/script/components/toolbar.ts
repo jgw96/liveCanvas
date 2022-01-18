@@ -27,7 +27,7 @@ export class AppToolbar extends LitElement {
 
       @media (prefers-color-scheme: dark) {
         :host {
-          background-color: var(--sl-color-neutral-0);
+          background-color: #282828;
           box-shadow: none;
           border-color: var(--sl-color-neutral-300);
           border-style: solid;

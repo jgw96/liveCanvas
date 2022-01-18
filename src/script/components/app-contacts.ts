@@ -1,9 +1,5 @@
-import {
-  LitElement,
-  css,
-  html,
-} from "lit";
-import { customElement, state } from 'lit/decorators.js';
+import { LitElement, css, html } from "lit";
+import { customElement, state } from "lit/decorators.js";
 import { getAccount } from "../services/auth";
 import { getContacts } from "../services/graph-api";
 
@@ -17,25 +13,35 @@ export class AppContacts extends LitElement {
         display: flex;
         flex-direction: column;
         justify-content: center;
+        min-width: 75%;
       }
+
+      .contactInfo sl-skeleton {
+        margin-top: 10px;
+      }
+
       .contactInfo .displayName {
         font-weight: bold;
-        color: black;
+        color: white;
       }
+
       .contactInfo .displayEmail {
         color: #6d6d6d;
       }
+
       #contactsHeader {
         display: flex;
         align-items: center;
         justify-content: space-between;
         margin-bottom: 1em;
       }
+
       #contactsHeader h3 {
         font-size: 1.5em;
         margin-top: 0;
         margin-bottom: 0;
       }
+
       #contactsBlock {
         background: rgb(213 213 213 / 67%);
         backdrop-filter: blur(10px);
@@ -49,6 +55,7 @@ export class AppContacts extends LitElement {
         animation-name: fadeIn;
         animation-duration: 280ms;
       }
+
       #contactsList {
         background: white;
         color: black;
@@ -62,39 +69,53 @@ export class AppContacts extends LitElement {
         padding: 1em 2em;
         overflow: hidden;
       }
-      #contactsList ul {
+
+      ul {
         margin: 0;
         padding: 0;
         list-style: none;
         overflow: auto;
-        max-height: 52vh;
+        height: 52vh;
       }
-      #contactsList ul::-webkit-scrollbar {
+
+      li {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 20px;
+      }
+
+      ul::-webkit-scrollbar {
         width: 8px;
         background: #222222;
         border-radius: 4px;
       }
+
       @media (prefers-color-scheme: light) {
-        #contactsList ul::-webkit-scrollbar {
+        ul::-webkit-scrollbar {
           background: #ffffff;
         }
       }
+
       #contactsList sl-menu-item {
         margin-top: 10px;
         background: transparent;
       }
+
       #contactsList sl-menu-item::part(content) {
         width: 100%;
         display: flex;
         align-items: center;
         justify-content: space-between;
       }
+
       #contactsList ul sl-button {
         height: 2em;
         border: solid 1px var(--app-color-primary);
         margin-bottom: 6px;
         background: var(--app-color-primary);
       }
+
       #contactsButton {
         position: fixed;
         bottom: 16px;
@@ -105,12 +126,15 @@ export class AppContacts extends LitElement {
         #contactsBlock {
           background: #ffffff4d;
         }
+
         #contactsList {
           background: #f5f5f5;
         }
+
         ##contactsBlock fast-switch::part(label) {
           color: black;
         }
+
         .contactInfo .displayName {
           color: black;
         }
@@ -130,12 +154,12 @@ export class AppContacts extends LitElement {
         }
       }
 
-      @media(max-width: 545px) {
+      @media (max-width: 545px) {
         #contactsButton {
-          top: 6px;
-          bottom: initial;
-          left: 6px;
-          right: initial;
+          top: initial;
+          bottom: 6px;
+          right: 105px;
+          left: initial;
         }
       }
     `;
@@ -146,6 +170,8 @@ export class AppContacts extends LitElement {
   }
 
   async selectContacts() {
+    await (this.shadowRoot?.querySelector("#contactsDialog") as any)?.show();
+
     const supported = "contacts" in navigator && "ContactsManager" in window;
 
     const account = getAccount();
@@ -173,7 +199,9 @@ export class AppContacts extends LitElement {
     }
   }
 
-  handleResults(contacts: any[]) {
+  async handleResults(contacts: any[]) {
+    await (this.shadowRoot?.querySelector("#contactsDialog") as any)?.hide();
+
     let addresses: any[] = [];
 
     contacts.forEach((contact) => {
@@ -202,44 +230,72 @@ export class AppContacts extends LitElement {
   }
 
   close() {
-    this.graphContacts = null;
+    (this.shadowRoot?.querySelector("#contactsDialog") as any)?.hide();
   }
 
   render() {
     return html`
       <sl-button id="contactsButton" @click="${() => this.selectContacts()}">
-        Share
+        Invite
       </sl-button>
-      ${this.graphContacts
-        ? html`<div id="contactsBlock">
-            <div id="contactsList">
-              <div id="contactsHeader">
-                <h3>Frequent Contacts</h3>
-                <sl-button id="closeButton" appearance="lightweight" @click="${() => this.close()}">
-                  <img src="/assets/close.svg" alt="close icon">
-                </sl-button>
-              </div>
-              <ul>
-                ${this.graphContacts.map((contact) => {
-                  return html`
-                    <sl-menu-item>
-                      <div class="contactInfo">
-                        <span class="displayName">${contact.displayName}</span>
-                        <span class="displayEmail"
-                          >Address: ${contact.emailAddresses[0].address}</span
-                        >
-                      </div>
-                      <sl-button
-                        @click="${() => this.handleResults([contact])}"
-                        >Select</sl-button
+
+      <sl-dialog
+        id="contactsDialog"
+        label="Invite Frequent Contacts"
+        class="dialog-overview"
+      >
+        <ul>
+          ${this.graphContacts
+            ? this.graphContacts.map((contact) => {
+                return html`
+                  <li>
+                    <div class="contactInfo">
+                      <span class="displayName">${contact.displayName}</span>
+                      <span class="displayEmail"
+                        >Address: ${contact.emailAddresses[0].address}</span
                       >
-                    </sl-menu-item>
-                  `;
-                })}
-              </ul>
-            </div>
-          </div>`
-        : null}
+                    </div>
+                    <sl-button @click="${() => this.handleResults([contact])}"
+                      >Select</sl-button
+                    >
+                  </li>
+                `;
+              })
+            : html`
+                <li>
+                  <div class="contactInfo">
+                    <sl-skeleton></sl-skeleton>
+                    <sl-skeleton></sl-skeleton>
+                  </div>
+                </li>
+
+                <li>
+                  <div class="contactInfo">
+                    <sl-skeleton></sl-skeleton>
+                    <sl-skeleton></sl-skeleton>
+                  </div>
+                </li>
+
+                <li>
+                  <div class="contactInfo">
+                    <sl-skeleton></sl-skeleton>
+                    <sl-skeleton></sl-skeleton>
+                  </div>
+                </li>
+
+                <li>
+                  <div class="contactInfo">
+                    <sl-skeleton></sl-skeleton>
+                    <sl-skeleton></sl-skeleton>
+                  </div>
+                </li>
+              `}
+        </ul>
+
+        <sl-button slot="footer" @click="${() => this.close()}"
+          >Cancel</sl-button
+        >
+      </sl-dialog>
     `;
   }
 }

@@ -2,7 +2,7 @@
   "relation": ["delegate_permission/common.handle_all_urls"],
   "target": {
     "namespace": "android_app",
-    "package_name": "com.Webboard.twa",
+    "package_name": "com.WebBoard.twa",
     "sha256_cert_fingerprints": [
       "8D:D4:23:9B:51:24:E2:08:7C:2B:7F:77:4B:AF:4D:95:61:AA:F5:4C:7E:C7:34:0C:51:14:B2:C0:98:3F:3E:91"
     ]

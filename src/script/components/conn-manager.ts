@@ -61,7 +61,6 @@ export class ConnManager extends LitElement {
   }
 
   firstUpdated() {
-    console.log('this.socket', this.socket);
     if (this.socket) {
       this.socket.on("disconnect", (reason: string) => {
         console.log("reason", reason);
@@ -124,6 +123,6 @@ export class ConnManager extends LitElement {
     ${this.tryingMessage
       ? html` <div id="tryingToast">${this.tryingMessage}</div> `
       : null}
-    } `;
+     `;
   }
 }

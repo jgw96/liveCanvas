@@ -14,8 +14,9 @@
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "@azure/msal-browser": "^2.12.0",
+    "@azure/msal-browser": "^2.21.0",
     "@pwabuilder/pwainstall": "^1.6.7",
+    "@thesoulfresh/pan-zoom": "^4.1.4",
     "@vaadin/router": "^1.7.4",
     "browser-fs-access": "^0.24.0",
     "idb-keyval": "^6.0.3",
@@ -28,6 +29,7 @@
     "@babel/compat-data": "^7.16.4",
     "@babel/preset-env": "^7.16.7",
     "@rollup/plugin-strip": "^2.1.0",
+    "@types/offscreencanvas": "^2019.6.4",
     "concurrently": "^7.0.0",
     "es-dev-server": "^2.1.0",
     "lit-analyzer": "^1.2.1",

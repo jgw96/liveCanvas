@@ -19,6 +19,7 @@ import {
   changeMode,
   changeColor,
   clearDrawings,
+  handleLiveEventsOffscreen,
 } from "../services/handle-canvas-new";
 import { get } from "idb-keyval";
 
@@ -436,6 +437,7 @@ export class AppHome extends LitElement {
 
     if (thirdCanvas && thirdContext && cursorCanvas) {
       await handleLiveEvents(thirdCanvas, thirdContext, this.socket, cursorCanvas);
+      // await handleLiveEventsOffscreen(thirdCanvas, thirdContext, this.socket, cursorCanvas);
     }
   }
 

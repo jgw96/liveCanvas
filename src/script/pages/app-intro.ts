@@ -29,6 +29,10 @@ export class AppIntro extends LitElement {
         height: 96vh;
       }
 
+      #glass {
+        margin-top: 2em;
+      }
+
       #sessionNameInput {
         margin-top: 1em;
       }
@@ -136,6 +140,11 @@ export class AppIntro extends LitElement {
           border-radius: 0;
           width: 100%;
           --sl-input-border-radius-medium: 0;
+
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
         }
         #new-button::part(base) {
           height: 3.6em;
@@ -148,6 +157,7 @@ export class AppIntro extends LitElement {
 
         #glass {
           padding-bottom: 3em;
+          margin-top: 4em;
         }
 
         #recent-header {
@@ -178,10 +188,6 @@ export class AppIntro extends LitElement {
         #screens img {
           width: 91%;
         }
-      }
-
-      #glass {
-        margin-top: 2em;
       }
 
       @media(horizontal-viewport-segments: 2) {
@@ -292,7 +298,7 @@ export class AppIntro extends LitElement {
 
       <div id="glass">
         <div>
-          ${this.savedSessions
+          ${this.savedSessions && this.savedSessions.length > 0
             ? html`<div id="welcomeBlock">
                 <h2>Recent Boards</h2>
 
@@ -334,7 +340,7 @@ export class AppIntro extends LitElement {
               `}
 
           <div id="saved-list">
-            ${this.savedSessions
+            ${this.savedSessions && this.savedSessions.length > 0
               ? this.savedSessions.map((session) => {
                   return html`
                     <session-item

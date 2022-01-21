@@ -14,6 +14,110 @@ let thirdCanvasSetup: HTMLCanvasElement | undefined;
 let thirdContextSetup: CanvasRenderingContext2D | null;
 let drawFlag: boolean = true;
 
+export function handleLiveEventsOffscreen(
+  thirdCanvas: HTMLCanvasElement,
+  thirdContext: CanvasRenderingContext2D,
+  socket: any,
+  cursorCanvas: HTMLCanvasElement,
+) {
+  console.log(window.OffscreenCanvas)
+  if (window.OffscreenCanvas) {
+    const offscreenCanvas = new OffscreenCanvas(
+      window.innerWidth,
+      window.innerHeight
+    );
+    console.log(offscreenCanvas);
+    offscreenContext = offscreenCanvas.getContext("2d");
+
+    offscreen = offscreenCanvas;
+
+    if (offscreenContext) {
+      offscreenContext.lineCap = "round";
+    }
+
+    if (cursorCanvas) {
+      cursorCanvas.width = window.innerWidth;
+      cursorCanvas.height = window.innerHeight;
+  
+      cursorContext = cursorCanvas.getContext("bitmaprenderer");
+    }
+
+    console.log('listening', socket);
+
+    socket.on("drawing", (data: any) => {
+      console.log('here');
+      if (offscreenContext) {
+        offscreenContext.strokeStyle = data.color;
+  
+        offscreenContext.globalCompositeOperation = data.globalCompositeOperation;
+  
+        if (data.pointerType === "pen") {
+          let tweakedPressure = data.pressure * 6;
+          offscreenContext.lineWidth = data.width + tweakedPressure;
+  
+          if (data.buttons === 32 && data.button === -1) {
+            // eraser
+            offscreenContext.globalCompositeOperation = "destination-out";
+  
+            offscreenContext.lineWidth = 18;
+          }
+        } else if (data.pointerType === "touch") {
+          offscreenContext.lineWidth = data.width - 20;
+        } else if (data.pointerType === "mouse") {
+          offscreenContext.lineWidth = 4;
+        }
+  
+        if (data.globalCompositeOperation === "destination-out") {
+          offscreenContext.lineWidth = 18;
+        }
+  
+        offscreenContext?.beginPath();
+        offscreenContext?.arc(data.x0, data.y0, 10, 0, 2 * Math.PI);
+        offscreenContext?.stroke();
+  
+        console.log('user', data.user);
+  
+        if (data.user) {
+          console.log('user', data.user);
+          offscreenContext?.fillText(data.user.name, data.x0 + 14, data.y0);
+        }
+  
+        console.log('offscreen', offscreen);
+  
+        offscreenContext.beginPath();
+  
+        offscreenContext.moveTo(data.x0, data.y0);
+  
+        offscreenContext.lineTo(data.x1, data.y1);
+  
+        offscreenContext.stroke();
+  
+        const prevScaledX = toTrueX(data.x0);
+        const prevScaledY = toTrueY(data.y0);
+  
+        const scaledY = toTrueY(data.y1);
+        const scaledX = toTrueX(data.x1);
+  
+        liveDrawings.push({
+          x0: prevScaledX,
+          y0: prevScaledY,
+          x1: scaledX,
+          y1: scaledY,
+          color: data.color,
+          lineWidth: thirdContext.lineWidth,
+        });
+
+        let bitmapOne = offscreen?.transferToImageBitmap();
+  
+        if (bitmapOne) {
+          console.log('transfer image', bitmapOne);
+          cursorContext?.transferFromImageBitmap(bitmapOne);
+        }
+      }
+    })
+  }
+}
+
 export const handleLiveEvents = (
   thirdCanvas: HTMLCanvasElement,
   thirdContext: CanvasRenderingContext2D,

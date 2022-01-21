@@ -19,7 +19,6 @@ import {
   changeMode,
   changeColor,
   clearDrawings,
-  handleLiveEventsOffscreen,
 } from "../services/handle-canvas-new";
 import { get } from "idb-keyval";
 

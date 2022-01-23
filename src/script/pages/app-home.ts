@@ -17,12 +17,9 @@ import {
   handleEvents,
   handleLiveEvents,
   changeMode,
-  changeColor,
-  clearDrawings,
-} from "../services/handle-canvas-new";
+  changeColor
+} from "../services/handle-canvas";
 import { get } from "idb-keyval";
-
-declare var io: any;
 
 @customElement("app-home")
 export class AppHome extends LitElement {
@@ -415,27 +412,29 @@ export class AppHome extends LitElement {
   }
 
   async setupEvents() {
-    /*const canvas = this.shadowRoot?.querySelector(
+    const canvas = this.shadowRoot?.querySelector(
       "canvas"
     ) as HTMLCanvasElement;
 
     const cursorCanvas: HTMLCanvasElement | null | undefined =
-      this.shadowRoot?.querySelector("#secondCanvas");*/
+      this.shadowRoot?.querySelector("#secondCanvas");
 
-    await handleEvents(this.color, this.ctx, this.socket);
+      if (canvas && cursorCanvas) {
+        await handleEvents(canvas, cursorCanvas, this.color, this.ctx, this.socket);
+      }
   }
 
   async setupLiveEvents() {
-    const cursorCanvas: HTMLCanvasElement | null | undefined =
-      this.shadowRoot?.querySelector("#secondCanvas");
+    /*const cursorCanvas: HTMLCanvasElement | null | undefined =
+      this.shadowRoot?.querySelector("#secondCanvas");*/
 
     const thirdCanvas: HTMLCanvasElement | null | undefined =
       this.shadowRoot?.querySelector("#thirdCanvas");
 
     const thirdContext = thirdCanvas?.getContext("2d");
 
-    if (thirdCanvas && thirdContext && cursorCanvas) {
-      await handleLiveEvents(thirdCanvas, thirdContext, this.socket, cursorCanvas);
+    if (thirdCanvas && thirdContext /*&& cursorCanvas*/) {
+      await handleLiveEvents(thirdCanvas, thirdContext, this.socket);
       // await handleLiveEventsOffscreen(thirdCanvas, thirdContext, this.socket, cursorCanvas);
     }
   }
@@ -513,7 +512,7 @@ export class AppHome extends LitElement {
       this.ctx?.fillRect(0, 0, canvas.width, canvas.height);
     }
 
-    clearDrawings();
+    // clearDrawings();
   }
 
   async handleSave() {

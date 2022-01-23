@@ -8,6 +8,8 @@ let offscreen: OffscreenCanvas | undefined;
 let offscreenContext: OffscreenCanvasRenderingContext2D | null;
 let thirdCanvas: HTMLCanvasElement | undefined;
 let thirdContext: CanvasRenderingContext2D | null;
+let waveform: any | undefined = undefined;
+let presenter: any | undefined = undefined;
 
 export const setHandle = async (handle: any) => {
   if (handle) {
@@ -34,6 +36,21 @@ export const setupCanvas = async (canvas: HTMLCanvasElement): Promise<CanvasRend
       ctx.fillStyle = window.matchMedia("(prefers-color-scheme: dark)").matches ? "#282828" : "white";
 
       ctx.fillRect(0, 0, canvas.width, canvas.height);
+    
+      if ((window as any).HapticsPredefinedWaveform) {
+        const WAVEFORM_BUZZ_CONTINUOUS = 4107;
+
+        waveform = new (window as any).HapticsPredefinedWaveform({
+          waveformId: WAVEFORM_BUZZ_CONTINUOUS,
+          intensity: 50,
+        });
+      }
+
+      if ((navigator as any).ink) {
+        presenter = await (navigator as any).ink.requestPresenter({
+          presentationArea: canvas,
+        });
+      }
     }
 
     return ctx;
@@ -94,6 +111,10 @@ export const handleEvents = async (
           ctx.globalCompositeOperation = "source-over";
         }
 
+        if (event.haptics && waveform) {
+          event.haptics.play(waveform);
+        }
+
         for (const pointer of changedPointers) {
           const previous = previousPointers.find((p) => p.id === pointer.id);
 
@@ -143,6 +164,11 @@ export const handleEvents = async (
             }
 
             ctx.stroke();
+
+            presenter.updateInkTrailStartPoint(event, {
+              color: pickedColor || color,
+              diameter: ctx.lineWidth,
+            });
 
             // cursor
             offscreenContext?.beginPath();

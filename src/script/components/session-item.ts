@@ -1,17 +1,13 @@
 import {
   LitElement,
   css,
-  html,
-  customElement,
-  property,
-  internalProperty,
-} from "lit-element";
+  html
+} from "lit";
+import { customElement, property } from 'lit/decorators.js';
 
 @customElement("session-item")
 export class SessionItem extends LitElement {
   @property({ type: Object }) session: any = null;
-
-  @internalProperty() codeGenerated: boolean = false;
 
   static get styles() {
     return css`
@@ -19,6 +15,11 @@ export class SessionItem extends LitElement {
         min-height: 8em;
 
         margin-bottom: 14px;
+      }
+
+      sl-card::part(body){
+        font-weight: bold;
+        font-size: 1.3em;
       }
 
       sl-card {
@@ -139,20 +140,6 @@ export class SessionItem extends LitElement {
     console.log(this.session);
   }
 
-  async generateCode() {
-    this.codeGenerated = true;
-
-    await this.updateComplete;
-
-    new (window as any).QRCode(this.shadowRoot?.querySelector("#code"), {
-      text: `https://www.live-canvas.app/${this.session.session}`,
-      width: 128,
-      height: 128,
-      colorDark: "#000000",
-      colorLight: "#ffffff",
-    });
-  }
-
   async share(session: any) {
     if ((navigator as any).share) {
       await (navigator as any).share({
@@ -183,7 +170,6 @@ export class SessionItem extends LitElement {
     return html`
       <sl-card>
         ${this.session.name}
-        ${this.codeGenerated ? html`<div id="code"></div>` : null}
 
         <div id="card-actions" slot="footer">
           <sl-button
@@ -201,12 +187,6 @@ export class SessionItem extends LitElement {
               variant="success"
               >Share</sl-button
             >
-
-            <!--<fast-button ?disabled="${this
-              .codeGenerated}" id="qr-button" @click="${() =>
-              this.generateCode()}">
-              QR Code
-            </fast-button>-->
 
             <a href="${`/${this.session.id}`}">Resume</a>
           </div>

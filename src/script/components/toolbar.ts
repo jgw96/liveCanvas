@@ -1,4 +1,6 @@
-import { LitElement, css, html, customElement, property } from "lit-element";
+import { LitElement, css, html } from "lit";
+import { customElement, property } from 'lit/decorators.js';
+
 import { getDevices } from "../services/graph-api";
 
 @customElement("app-toolbar")
@@ -25,7 +27,7 @@ export class AppToolbar extends LitElement {
 
       @media (prefers-color-scheme: dark) {
         :host {
-          background-color: var(--sl-color-neutral-0);
+          background-color: #282828;
           box-shadow: none;
           border-color: var(--sl-color-neutral-300);
           border-style: solid;

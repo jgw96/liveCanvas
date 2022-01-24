@@ -3,9 +3,8 @@ import {
   LitElement,
   css,
   html,
-  customElement,
-  internalProperty,
-} from "lit-element";
+} from "lit";
+import { customElement, state } from 'lit/decorators.js';
 import { getSavedSessions, saveSession } from "../services/sessions";
 import { randoRoom } from "../services/utils";
 
@@ -13,9 +12,9 @@ import "../components/session-item";
 
 @customElement("app-intro")
 export class AppIntro extends LitElement {
-  @internalProperty() savedSessions: Array<any> | undefined = [];
+  @state() savedSessions: Array<any> | undefined = [];
 
-  @internalProperty() sessionName: string | undefined;
+  @state() sessionName: string | undefined;
 
   newRoom: string | undefined = undefined;
 
@@ -28,6 +27,14 @@ export class AppIntro extends LitElement {
         padding: 16px;
 
         height: 96vh;
+      }
+
+      #glass {
+        margin-top: 2em;
+      }
+
+      #sessionNameInput {
+        margin-top: 1em;
       }
 
       #welcomeBlock {
@@ -133,6 +140,15 @@ export class AppIntro extends LitElement {
           border-radius: 0;
           width: 100%;
           --sl-input-border-radius-medium: 0;
+
+          position: fixed;
+          bottom: 0;
+          left: 0;
+          right: 0;
+        }
+        #new-button::part(base) {
+          height: 3.6em;
+          align-items: center;
         }
 
         #welcomeBlock h2 {
@@ -141,6 +157,7 @@ export class AppIntro extends LitElement {
 
         #glass {
           padding-bottom: 3em;
+          margin-top: 4em;
         }
 
         #recent-header {
@@ -171,10 +188,6 @@ export class AppIntro extends LitElement {
         #screens img {
           width: 91%;
         }
-      }
-
-      #glass {
-        
       }
 
       @media(horizontal-viewport-segments: 2) {
@@ -285,16 +298,16 @@ export class AppIntro extends LitElement {
 
       <div id="glass">
         <div>
-          ${this.savedSessions
+          ${this.savedSessions && this.savedSessions.length > 0
             ? html`<div id="welcomeBlock">
-                <h2>Welcome!</h2>
+                <h2>Recent Boards</h2>
 
                 <sl-button
                   variant="primary"
                   id="new-button"
                   @click="${() => this.newLive()}"
                 >
-                  New Session
+                  New Board
                 </sl-button>
               </div>`
             : html`
@@ -302,10 +315,10 @@ export class AppIntro extends LitElement {
                   <div id="intro-block">
                     <h2>Welcome!</h2>
                     <p>
-                      LiveCanvas is an open source collaborative drawing app
-                      offering a simple and fast user experience. LiveCanvas can
+                      WebBoard is an open source, collaborative whiteboarding app
+                      offering a simple and fast user experience. WebBoard can
                       be used with anyone, simply share a link and you are ready
-                      to go! Tap "New Session" to get started!
+                      to go! Tap "New Board" to get started!
                     </p>
 
                     <sl-button
@@ -313,7 +326,7 @@ export class AppIntro extends LitElement {
                       id="new-button"
                       @click="${() => this.newLive()}"
                     >
-                      New Session
+                      New Board
                     </sl-button>
                   </div>
 
@@ -325,11 +338,9 @@ export class AppIntro extends LitElement {
                   </div>
                 </div>
               `}
-          ${this.savedSessions
-            ? html`<h3 id="recent-header">Recent Sessions</h3>`
-            : null}
+
           <div id="saved-list">
-            ${this.savedSessions
+            ${this.savedSessions && this.savedSessions.length > 0
               ? this.savedSessions.map((session) => {
                   return html`
                     <session-item

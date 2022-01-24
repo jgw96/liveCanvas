@@ -8,9 +8,4 @@ onmessage = (evt) => {
   if (evt.data.data) {
     console.log(evt.data.data);
   }
-  // var gl = canvas.getContext("2d");
-
-
-
-  // ... some drawing using the gl context ...
 };

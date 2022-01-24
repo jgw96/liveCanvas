@@ -1,13 +1,13 @@
 {
   "background_color": "#686bd2",
-  "description": "LiveCanvas is an open source collaborative drawing app offering a simple and fast user experience. LiveCanvas can be used with anyone, simply share a link and you are ready to go!",
+  "description": "WebBoard is an open source collaborative drawing app offering a simple and fast user experience. WebBoard can be used with anyone, simply share a link and you are ready to go!",
   "display": "standalone",
   "lang": "EN-US",
-  "name": "LiveCanvas",
+  "name": "WebBoard",
   "orientation": "any",
   "prefer_related_applications": false,
   "related_applications": [],
-  "short_name": "LiveCanvas",
+  "short_name": "WebBoard",
   "start_url": "/",
   "theme_color": "#686bd2",
   "categories": [

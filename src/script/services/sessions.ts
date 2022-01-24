@@ -1,7 +1,7 @@
 import { get, set } from "idb-keyval";
 
 export async function deleteSession(sessionString: string) {
-  const sessions: Array<string> | null = await get("savedSessions");
+  const sessions: Array<string> | null | undefined = await get("savedSessions");
 
   if (sessions) {
     const filtered = sessions.filter((session: any) => {
@@ -21,7 +21,7 @@ export async function deleteSession(sessionString: string) {
 }
 
 export async function getSavedSessions(): Promise<any[] | null> {
-  const sessions: Array<string> | null = await get("savedSessions");
+  const sessions: Array<string> | null | undefined = await get("savedSessions");
 
   if (sessions) {
     return sessions;
@@ -32,7 +32,7 @@ export async function getSavedSessions(): Promise<any[] | null> {
 
 export async function saveSession(session: any) {
   console.log('saving session', session);
-    const sessions: Array<string> | null = await get("savedSessions");
+    const sessions: Array<string> | null | undefined = await get("savedSessions");
     console.log("sessions", sessions);
 
     if (sessions) {

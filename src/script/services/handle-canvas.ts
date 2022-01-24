@@ -2,12 +2,12 @@ import { get, set } from "idb-keyval";
 
 let pickedColor: string | undefined;
 let pickedMode: "pen" | "erase" = "pen";
-let cursorContext: ImageBitmapRenderingContext | null;
+// let cursorContext: ImageBitmapRenderingContext | null;
 let handle: any | undefined;
-let offscreen: OffscreenCanvas | undefined;
+/*let offscreen: OffscreenCanvas | undefined;
 let offscreenContext: OffscreenCanvasRenderingContext2D | null;
 let thirdCanvas: HTMLCanvasElement | undefined;
-let thirdContext: CanvasRenderingContext2D | null;
+let thirdContext: CanvasRenderingContext2D | null;*/
 let waveform: any | undefined = undefined;
 let presenter: any | undefined = undefined;
 let mainContext: CanvasRenderingContext2D | null;

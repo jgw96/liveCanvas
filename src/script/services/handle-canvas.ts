@@ -147,6 +147,26 @@ export const handleEvents = async (
 
   const userData: any = await get("userData");
 
+  if (canvas) {
+    canvas.onpointermove = (ev: PointerEvent) => {
+      if (ev.buttons === 32 && ev.button === -1 && ctx) {
+        // eraser
+
+        let tweakedPressure = ev.pressure * 6;
+
+        ctx.lineWidth = 18 + tweakedPressure;
+
+        ctx.strokeStyle = ctx.fillStyle;
+        ctx.beginPath();
+        ctx.moveTo(ev.clientX, ev.clientY);
+        for (const point of ev.getCoalescedEvents()) {
+          ctx.lineTo(point.clientX, point.clientY);
+        }
+        ctx.stroke();
+      }
+    };
+  }
+
   new module.default(canvas, {
     start(pointer, event) {
       console.log(pointer);
@@ -172,8 +192,13 @@ export const handleEvents = async (
           const previous = previousPointers.find((p) => p.id === pointer.id);
 
           if (ctx && previous) {
-
             ctx.strokeStyle = pickedColor || color;
+
+            console.log(
+              "should erase",
+              (pointer.nativePointer as PointerEvent).buttons,
+              (pointer.nativePointer as PointerEvent).button
+            );
 
             if ((pointer.nativePointer as PointerEvent).pointerType === "pen") {
               let tweakedPressure =
@@ -182,23 +207,6 @@ export const handleEvents = async (
                 (pointer.nativePointer as PointerEvent).width + tweakedPressure;
 
               lineWidth = ctx.lineWidth;
-
-              if (
-                (pointer.nativePointer as PointerEvent).buttons === 32 &&
-                (pointer.nativePointer as PointerEvent).button === -1
-              ) {
-                // eraser
-                ctx.lineWidth = 18;
-                lineWidth = 18;
-
-                ctx.strokeStyle = ctx.fillStyle;
-                ctx.beginPath();
-                ctx.moveTo(previous.clientX, previous.clientY);
-                for (const point of pointer.getCoalesced()) {
-                  ctx.lineTo(point.clientX, point.clientY);
-                }
-                ctx.stroke();
-              }
             } else if (
               (pointer.nativePointer as PointerEvent).pointerType === "touch"
             ) {
@@ -222,7 +230,7 @@ export const handleEvents = async (
 
             ctx.stroke();
 
-            console.log('drawing', ctx);
+            console.log("drawing", ctx);
 
             presenter.updateInkTrailStartPoint(event, {
               color: pickedColor || color,

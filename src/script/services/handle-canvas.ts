@@ -1,7 +1,7 @@
 import { get, set } from "idb-keyval";
 
 let pickedColor: string | undefined;
-let pickedMode: 'pen' | 'erase' = "pen";
+let pickedMode: "pen" | "erase" = "pen";
 let cursorContext: ImageBitmapRenderingContext | null;
 let handle: any | undefined;
 let offscreen: OffscreenCanvas | undefined;
@@ -10,33 +10,89 @@ let thirdCanvas: HTMLCanvasElement | undefined;
 let thirdContext: CanvasRenderingContext2D | null;
 let waveform: any | undefined = undefined;
 let presenter: any | undefined = undefined;
+let mainContext: CanvasRenderingContext2D | null;
+let worker: any;
+let working: boolean = false;
+let workingTimeout: any;
+
+let liveEvents: any[] = [];
 
 export const setHandle = async (handle: any) => {
   if (handle) {
-    console.log('set handle', handle);
+    console.log("set handle", handle);
     handle = handle;
-    await set('current_handle', handle);
+    await set("current_handle", handle);
   }
-}
+};
 
-export const setupCanvas = async (canvas: HTMLCanvasElement): Promise<CanvasRenderingContext2D | null> => {
+const handleResize = (
+  context: CanvasRenderingContext2D,
+  canvas: HTMLCanvasElement | OffscreenCanvas
+) => {
+  if (canvas) {
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+  }
+
+  if (context) {
+    context.lineCap = "round";
+    context.lineJoin = "round";
+    if (pickedColor) {
+      context.strokeStyle = pickedColor;
+    }
+    context.lineWidth = 5;
+
+    context.fillStyle = window.matchMedia("(prefers-color-scheme: dark)")
+      .matches
+      ? "#181818"
+      : "white";
+  }
+
+  if (worker) {
+    worker.postMessage({
+      resize: {
+        width: window.innerWidth,
+        height: window.innerHeight,
+        fillStyle: window.matchMedia("(prefers-color-scheme: dark)").matches
+          ? "#181818"
+          : "white",
+      },
+    });
+  }
+};
+
+export const doResize = async (canvas: HTMLCanvasElement) => {
+  if (canvas && mainContext) {
+    handleResize(mainContext, canvas);
+  }
+};
+
+export const setupCanvas = async (
+  canvas: HTMLCanvasElement
+): Promise<CanvasRenderingContext2D | null> => {
   if (canvas) {
     canvas.height = window.innerHeight;
     canvas.width = window.innerWidth;
 
     const ctx = canvas.getContext("2d", {
-      desynchronized: navigator.userAgent.toLowerCase().includes("android") ? false : true,
+      desynchronized: navigator.userAgent.toLowerCase().includes("android")
+        ? false
+        : true,
     });
+
+    mainContext = ctx;
 
     if (ctx) {
       ctx.lineWidth = 5;
       ctx.lineCap = "round";
 
       // white if light theme, black if dark theme
-      ctx.fillStyle = window.matchMedia("(prefers-color-scheme: dark)").matches ? "#282828" : "white";
+      ctx.fillStyle = window.matchMedia("(prefers-color-scheme: dark)").matches
+        ? "#181818"
+        : "white";
 
       ctx.fillRect(0, 0, canvas.width, canvas.height);
-    
+
       if ((window as any).HapticsPredefinedWaveform) {
         const WAVEFORM_BUZZ_CONTINUOUS = 4107;
 
@@ -65,7 +121,7 @@ export const changeColor = (color: string) => {
 
 export const changeMode = (mode: "pen" | "erase") => {
   pickedMode = mode;
-}
+};
 
 export const handleEvents = async (
   canvas: HTMLCanvasElement,
@@ -79,17 +135,14 @@ export const handleEvents = async (
   if (cursorCanvas) {
     cursorCanvas.width = window.innerWidth;
     cursorCanvas.height = window.innerHeight;
-
-    cursorContext = cursorCanvas.getContext("bitmaprenderer");
   }
 
-  if (window.OffscreenCanvas) {
-    offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);
-    offscreenContext = offscreen.getContext("2d");
+  if (window.OffscreenCanvas && cursorCanvas) {
+    const testOffscreen = cursorCanvas.transferControlToOffscreen();
 
-    if (offscreenContext) {
-      offscreenContext.lineWidth = 4;
-    }
+    worker = new Worker("offscreen.js");
+    console.log("worker", worker);
+    worker.postMessage({ canvas: testOffscreen }, [testOffscreen]);
   }
 
   const userData: any = await get("userData");
@@ -104,8 +157,6 @@ export const handleEvents = async (
       console.log(pointer);
     },
     move(previousPointers, changedPointers, event: any) {
-      console.log(event);
-
       if (pickedMode === "pen") {
         if (ctx) {
           ctx.globalCompositeOperation = "source-over";
@@ -115,12 +166,13 @@ export const handleEvents = async (
           event.haptics.play(waveform);
         }
 
+        let lineWidth;
+
         for (const pointer of changedPointers) {
           const previous = previousPointers.find((p) => p.id === pointer.id);
 
-          console.log('nativePointer', pointer.nativePointer);
-
           if (ctx && previous) {
+
             ctx.strokeStyle = pickedColor || color;
 
             if ((pointer.nativePointer as PointerEvent).pointerType === "pen") {
@@ -129,12 +181,15 @@ export const handleEvents = async (
               ctx.lineWidth =
                 (pointer.nativePointer as PointerEvent).width + tweakedPressure;
 
+              lineWidth = ctx.lineWidth;
+
               if (
                 (pointer.nativePointer as PointerEvent).buttons === 32 &&
                 (pointer.nativePointer as PointerEvent).button === -1
               ) {
                 // eraser
                 ctx.lineWidth = 18;
+                lineWidth = 18;
 
                 ctx.strokeStyle = ctx.fillStyle;
                 ctx.beginPath();
@@ -149,10 +204,12 @@ export const handleEvents = async (
             ) {
               ctx.lineWidth =
                 (pointer.nativePointer as PointerEvent).width - 20;
+              lineWidth = ctx.lineWidth;
             } else if (
               (pointer.nativePointer as PointerEvent).pointerType === "mouse"
             ) {
               ctx.lineWidth = 4;
+              lineWidth = 4;
             }
 
             ctx.beginPath();
@@ -165,13 +222,15 @@ export const handleEvents = async (
 
             ctx.stroke();
 
+            console.log('drawing', ctx);
+
             presenter.updateInkTrailStartPoint(event, {
               color: pickedColor || color,
               diameter: ctx.lineWidth,
             });
 
             // cursor
-            offscreenContext?.beginPath();
+            /*offscreenContext?.beginPath();
             offscreenContext?.arc(
               event.clientX,
               event.clientY,
@@ -179,15 +238,14 @@ export const handleEvents = async (
               0,
               2 * Math.PI
             );
-            offscreenContext?.stroke();
+            offscreenContext?.stroke();*/
 
-            let bitmapOne = offscreen?.transferToImageBitmap();
+            /*let bitmapOne = offscreen?.transferToImageBitmap();
             if (bitmapOne) {
               cursorContext?.transferFromImageBitmap(bitmapOne);
-            }
+            }*/
 
             if (socket) {
-              console.log("pointer event", event);
               socket.emit("drawing", {
                 x0: previous.clientX,
                 y0: previous.clientY,
@@ -198,24 +256,27 @@ export const handleEvents = async (
                 button: event.button,
                 pointerType: (event as PointerEvent).pointerType,
                 pressure: (event as PointerEvent).pressure,
-                width: (event as PointerEvent).width,
+                width: lineWidth,
                 globalCompositeOperation: "source-over",
                 user: userData ? userData.name : null,
               });
             }
 
-            (window as any).requestIdleCallback(async () => {
-              if (canvas) {
-                let canvasState = canvas.toDataURL();
-                await set("canvasState", canvasState);
+            (window as any).requestIdleCallback(
+              async () => {
+                if (canvas) {
+                  let canvasState = canvas.toDataURL();
+                  await set("canvasState", canvasState);
+                }
+              },
+              {
+                timeout: 200,
               }
-            }, {
-              timeout: 200
-            });
+            );
           }
         }
       } else if (pickedMode === "erase") {
-        console.log('erasing');
+        console.log("erasing");
         if (ctx) {
           ctx.strokeStyle = ctx.fillStyle;
 
@@ -250,46 +311,33 @@ export const handleEvents = async (
               });
             }
 
-            (window as any).requestIdleCallback(async () => {
-              const fileModule = await import('browser-fs-access');
+            (window as any).requestIdleCallback(
+              async () => {
+                const fileModule = await import("browser-fs-access");
 
-              if (canvas) {
-                let canvasState = canvas.toDataURL();
-                await set("canvasState", canvasState);
+                if (canvas) {
+                  let canvasState = canvas.toDataURL();
+                  await set("canvasState", canvasState);
 
-                if (handle) {
-                  canvas.toBlob(async (blob) => {
-                    if (blob) {
-                      await fileModule.fileSave(blob, {}, handle);
-                    }
-                  })
+                  if (handle) {
+                    canvas.toBlob(async (blob) => {
+                      if (blob) {
+                        await fileModule.fileSave(blob, {}, handle);
+                      }
+                    });
+                  }
                 }
+              },
+              {
+                timeout: 200,
               }
-            }, {
-              timeout: 200
-            });
+            );
           });
         }
       }
     },
   });
 };
-
-export const resetCursorCanvas = (width: number, height: number) => {
-  if (offscreen) {
-    offscreen.width = width;
-    offscreen.height = height;
-  }
-
-  if (thirdCanvas) {
-    thirdCanvas.width = width;
-    thirdCanvas.height = height;
-  }
-
-  if (thirdContext) {
-    thirdContext.lineCap = "round";
-  }
-}
 
 export const handleLiveEvents = (
   thirdCanvas: HTMLCanvasElement,
@@ -307,63 +355,20 @@ export const handleLiveEvents = (
     thirdContext = thirdContext;
   }
 
-  if (window.OffscreenCanvas) {
-    const offscreen = new OffscreenCanvas(window.innerWidth, window.innerHeight);
-    const offscreenContext = offscreen.getContext("2d");
-
-    if (offscreenContext) {
-      offscreenContext.font = "20px sans-serif";
-    }
-  }
-
   socket.on("drawing", (data: any) => {
-    console.log(data);
-    if (thirdContext) {
-      thirdContext.strokeStyle = data.color;
+    working = true;
 
-      thirdContext.globalCompositeOperation = data.globalCompositeOperation;
+    liveEvents.push(data);
 
-      if (data.pointerType === "pen") {
-        let tweakedPressure = data.pressure * 6;
-        thirdContext.lineWidth = data.width + tweakedPressure;
-
-        if (data.buttons === 32 && data.button === -1) {
-          // eraser
-          thirdContext.globalCompositeOperation = "destination-out";
-
-          thirdContext.lineWidth = 18;
-        }
-      } else if (data.pointerType === "touch") {
-        thirdContext.lineWidth = data.width - 20;
-      } else if (data.pointerType === "mouse") {
-        thirdContext.lineWidth = 4;
-      }
-
-      if (data.globalCompositeOperation === "destination-out") {
-        thirdContext.lineWidth = 18;
-      }
-
-      offscreenContext?.beginPath();
-      offscreenContext?.arc(data.x0, data.y0, 10, 0, 2 * Math.PI);
-      offscreenContext?.stroke();
-
-      if (data.user) {
-        offscreenContext?.fillText(data.user, data.x0 + 14, data.y0);
-      }
-
-      let bitmapOne = offscreen?.transferToImageBitmap();
-
-      if (bitmapOne) {
-        cursorContext?.transferFromImageBitmap(bitmapOne);
-      }
-
-      thirdContext.beginPath();
-
-      thirdContext.moveTo(data.x0, data.y0);
-
-      thirdContext.lineTo(data.x1, data.y1);
-
-      thirdContext.stroke();
+    if (working === true) {
+      clearTimeout(workingTimeout);
     }
+
+    workingTimeout = setTimeout(() => {
+      working = false;
+      worker.postMessage({ liveEvents });
+
+      liveEvents = [];
+    }, 120);
   });
 };

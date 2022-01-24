@@ -25,7 +25,7 @@ export default {
         { src: 'src/global.css', dest: 'dist/'},
         { src: 'manifest.json', dest: 'dist/'},
         { src: 'fast-components.js', dest: 'dist/'},
-        { src: 'qrcode.min.js', dest: 'dist/'},
+        { src: 'offscreen.js', dest: 'dist/'},
         { src: 'routes.json', dest: 'dist/' }
       ]
     }),

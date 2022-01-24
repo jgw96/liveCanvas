@@ -17,7 +17,8 @@ import {
   handleEvents,
   handleLiveEvents,
   changeMode,
-  changeColor
+  changeColor,
+  doResize
 } from "../services/handle-canvas";
 import { get } from "idb-keyval";
 
@@ -349,6 +350,8 @@ export class AppHome extends LitElement {
     } else {
       await this.setupEvents();
     }
+
+    window.addEventListener("resize", () => this.handleResize());
   }
 
   async handleResize() {
@@ -356,7 +359,9 @@ export class AppHome extends LitElement {
       "canvas"
     ) as HTMLCanvasElement;
 
-    canvas.width = window.innerWidth;
+    console.log("canvas", canvas);
+
+    /*canvas.width = window.innerWidth;
     canvas.height = window.innerHeight;
 
     if (this.ctx) {
@@ -367,6 +372,23 @@ export class AppHome extends LitElement {
       this.ctx.lineJoin = "round";
       this.ctx.strokeStyle = this.color;
       this.ctx.lineWidth = 5;
+
+      this.ctx.fillStyle = window.matchMedia("(prefers-color-scheme: dark)").matches ? "#282828" : "white";
+    }*/
+
+    if (canvas) {
+      doResize(canvas);
+      
+     //  const secondCanvas = this.shadowRoot?.querySelector("#secondCanvas") as HTMLCanvasElement;
+      const thirdCanvas = this.shadowRoot?.querySelector("#thirdCanvas") as HTMLCanvasElement;
+
+     /* if (secondCanvas) {
+        doResize(secondCanvas);
+      }*/
+
+      if (thirdCanvas) {
+        doResize(thirdCanvas);
+      }
     }
 
     const canvasState = await (get("canvasState") as any);
@@ -413,7 +435,7 @@ export class AppHome extends LitElement {
 
   async setupEvents() {
     const canvas = this.shadowRoot?.querySelector(
-      "canvas"
+      "#firstCanvas"
     ) as HTMLCanvasElement;
 
     const cursorCanvas: HTMLCanvasElement | null | undefined =
